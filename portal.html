@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heritage Connect — Patient Portal | Heritage Health Services</title>
+    <meta name="description" content="Heritage Connect secure patient portal. Track visits, view care plans, and manage scheduling for Heritage Health Services.">
+    <link rel="stylesheet" href="portal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="logo-header-dark.png" type="image/png">
+</head>
+<body>
+
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-logo">
+                <img src="logo-header-light.png" alt="Heritage Health" class="sidebar-logo-img">
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="#" class="sidebar-link active" data-page="dashboard">
+                <i class="fa-solid fa-grip-vertical"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="sidebar-link" data-page="visits">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>Visit Log</span>
+            </a>
+            <a href="#" class="sidebar-link" data-page="careplan">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <span>Care Plan</span>
+            </a>
+            <a href="#" class="sidebar-link" data-page="schedule">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Schedule</span>
+            </a>
+            <a href="#" class="sidebar-link" data-page="documents">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Documents</span>
+            </a>
+
+            <div class="nav-section-label">Account</div>
+            <a href="#" class="sidebar-link" data-page="profile">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Profile</span>
+            </a>
+            <a href="#" class="sidebar-link" data-page="messages">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Messages</span>
+                <span class="badge">3</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="user-avatar">MJ</div>
+                <div class="user-info">
+                    <span class="user-name">Maria J.</span>
+                    <span class="user-role">Client</span>
+                </div>
+            </div>
+            <a href="index.html" class="sidebar-link sidebar-logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Sign Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ═══════════ MOBILE HEADER ═══════════ -->
+    <header class="mobile-header" id="mobileHeader">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="mobile-title">Heritage Connect</span>
+        <div class="user-avatar user-avatar-sm">MJ</div>
+    </header>
+
+    <!-- ═══════════ MAIN CONTENT AREA ═══════════ -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ═══════════ DASHBOARD PAGE ═══════════ -->
+        <div class="page active" id="page-dashboard">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Good Morning, Maria</h1>
+                    <p class="page-subtitle">Here's your care overview for today</p>
+                </div>
+                <div class="page-actions">
+                    <span class="date-display"><i class="fa-regular fa-calendar"></i> April 16, 2026</span>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(52, 211, 153, 0.1); color: #10B981;">
+                        <i class="fa-solid fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">142</span>
+                        <span class="stat-label">Visits Completed</span>
+                    </div>
+                    <span class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6;">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">426</span>
+                        <span class="stat-label">Total Care Hours</span>
+                    </div>
+                    <span class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> 8%</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(201, 168, 76, 0.1); color: #C9A84C;">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">4.9</span>
+                        <span class="stat-label">Care Rating</span>
+                    </div>
+                    <span class="stat-trend neutral">Excellent</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8B5CF6;">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">Upcoming Visits</span>
+                    </div>
+                    <span class="stat-trend neutral">This Week</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Today's Schedule -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Today's Schedule</h3>
+                        <a href="#" class="card-link" data-goto="schedule">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="time">8:00 AM</span>
+                                <span class="duration">2 hrs</span>
+                            </div>
+                            <div class="schedule-bar active"></div>
+                            <div class="schedule-details">
+                                <h4>Morning Routine Assistance</h4>
+                                <p><i class="fa-solid fa-user-nurse"></i> Sarah M. — <span class="status-badge completed">Completed</span></p>
+                                <p class="evv-tag"><i class="fa-solid fa-location-dot"></i> EVV Verified — 7:58 AM check-in</p>
+                            </div>
+                        </div>
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="time">12:30 PM</span>
+                                <span class="duration">1.5 hrs</span>
+                            </div>
+                            <div class="schedule-bar upcoming"></div>
+                            <div class="schedule-details">
+                                <h4>Lunch Prep &amp; Hygiene Care</h4>
+                                <p><i class="fa-solid fa-user-nurse"></i> Sarah M. — <span class="status-badge upcoming">Upcoming</span></p>
+                            </div>
+                        </div>
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="time">6:00 PM</span>
+                                <span class="duration">2 hrs</span>
+                            </div>
+                            <div class="schedule-bar upcoming"></div>
+                            <div class="schedule-details">
+                                <h4>Evening Routine &amp; Transfer</h4>
+                                <p><i class="fa-solid fa-user-nurse"></i> Sarah M. — <span class="status-badge upcoming">Upcoming</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-feed">
+                            <div class="activity-item">
+                                <div class="activity-dot" style="background: #10B981;"></div>
+                                <div class="activity-content">
+                                    <p><strong>Morning visit completed</strong></p>
+                                    <span>Sarah M. checked out at 10:02 AM</span>
+                                    <time>Today, 10:02 AM</time>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot" style="background: #3B82F6;"></div>
+                                <div class="activity-content">
+                                    <p><strong>Care note added</strong></p>
+                                    <span>Blood pressure reading: 128/82. Within normal range.</span>
+                                    <time>Today, 9:15 AM</time>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot" style="background: #C9A84C;"></div>
+                                <div class="activity-content">
+                                    <p><strong>Care plan updated</strong></p>
+                                    <span>RN Rachel updated medication schedule notes.</span>
+                                    <time>Yesterday, 3:30 PM</time>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot" style="background: #10B981;"></div>
+                                <div class="activity-content">
+                                    <p><strong>Evening visit completed</strong></p>
+                                    <span>Sarah M. checked out at 8:05 PM</span>
+                                    <time>Yesterday, 8:05 PM</time>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot" style="background: #8B5CF6;"></div>
+                                <div class="activity-content">
+                                    <p><strong>Document uploaded</strong></p>
+                                    <span>Monthly assessment report — April 2026</span>
+                                    <time>Apr 14, 2:00 PM</time>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caregiver Info -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Your Care Team</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="team-member primary">
+                            <div class="team-avatar">SM</div>
+                            <div class="team-info">
+                                <h4>Sarah M.</h4>
+                                <p>Personal Care Assistant</p>
+                                <span class="team-status online"><i class="fa-solid fa-circle"></i> On Shift</span>
+                            </div>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar rn">RN</div>
+                            <div class="team-info">
+                                <h4>Rachel N., RN</h4>
+                                <p>Supervising Nurse</p>
+                                <span class="team-status">Next review: Apr 22</span>
+                            </div>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar cc">JD</div>
+                            <div class="team-info">
+                                <h4>Jessica D.</h4>
+                                <p>Care Coordinator</p>
+                                <span class="team-status"><i class="fa-solid fa-phone"></i> (262) 554-8800 ext. 12</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" onclick="alert('Opening message composer...')">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Message Care Team</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="alert('Downloading report...')">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Download Reports</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="alert('Opening schedule request...')">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                                <span>Request Schedule Change</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="alert('Calling Heritage Health: (262) 554-8800')">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>Call Office</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ VISIT LOG PAGE ═══════════ -->
+        <div class="page" id="page-visits">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Visit Log</h1>
+                    <p class="page-subtitle">Electronic Visit Verification records</p>
+                </div>
+                <div class="page-actions">
+                    <select class="filter-select" id="visitFilter">
+                        <option>All Visits</option>
+                        <option>This Week</option>
+                        <option>This Month</option>
+                        <option>Last 30 Days</option>
+                    </select>
+                    <button class="btn-portal-outline" onclick="alert('Exporting visit log as PDF...')">
+                        <i class="fa-solid fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Caregiver</th>
+                                <th>Service</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Hours</th>
+                                <th>EVV Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ CARE PLAN PAGE ═══════════ -->
+        <div class="page" id="page-careplan">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Care Plan</h1>
+                    <p class="page-subtitle">Your personalized plan of care — Last updated Apr 14, 2026</p>
+                </div>
+            </div>
+
+            <div class="careplan-grid">
+                <div class="card careplan-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-sun" style="color: #C9A84C;"></i> Morning Routine</h3>
+                        <span class="time-tag">8:00 AM — 10:00 AM</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="careplan-tasks">
+                            <li><i class="fa-solid fa-check"></i> Assist out of bed and transfer to wheelchair</li>
+                            <li><i class="fa-solid fa-check"></i> Oral hygiene and grooming assistance</li>
+                            <li><i class="fa-solid fa-check"></i> Dressing assistance (upper and lower body)</li>
+                            <li><i class="fa-solid fa-check"></i> Prepare and serve breakfast</li>
+                            <li><i class="fa-solid fa-check"></i> Morning medication reminder</li>
+                            <li><i class="fa-solid fa-check"></i> Blood pressure check and log</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card careplan-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-cloud-sun" style="color: #3B82F6;"></i> Midday Care</h3>
+                        <span class="time-tag">12:30 PM — 2:00 PM</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="careplan-tasks">
+                            <li><i class="fa-solid fa-check"></i> Lunch preparation and feeding assistance</li>
+                            <li><i class="fa-solid fa-check"></i> Personal hygiene — incontinence care</li>
+                            <li><i class="fa-solid fa-check"></i> Light housekeeping around living area</li>
+                            <li><i class="fa-solid fa-check"></i> Companionship and engagement activities</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card careplan-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-moon" style="color: #8B5CF6;"></i> Evening Routine</h3>
+                        <span class="time-tag">6:00 PM — 8:00 PM</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="careplan-tasks">
+                            <li><i class="fa-solid fa-check"></i> Dinner preparation and serving</li>
+                            <li><i class="fa-solid fa-check"></i> Evening medication reminder</li>
+                            <li><i class="fa-solid fa-check"></i> Bathing / showering assistance</li>
+                            <li><i class="fa-solid fa-check"></i> Pajama dressing and bed transfer</li>
+                            <li><i class="fa-solid fa-check"></i> Ensure home is secure for the night</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card careplan-card notes-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-clipboard-list" style="color: #10B981;"></i> Clinical Notes</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="clinical-note">
+                            <div class="note-header">
+                                <strong>RN Rachel N.</strong>
+                                <time>April 14, 2026</time>
+                            </div>
+                            <p>Maria continues to show improved mobility with daily transfer exercises. Blood pressure trending stable at 128/82. Updated medication schedule per Dr. Williams' recommendation. Continue current care plan with additional focus on range-of-motion exercises during morning routine.</p>
+                        </div>
+                        <div class="clinical-note">
+                            <div class="note-header">
+                                <strong>Sarah M., PCA</strong>
+                                <time>April 15, 2026</time>
+                            </div>
+                            <p>Morning vital signs within normal limits. Maria had a good appetite today. Completed all ADL tasks as outlined. She mentioned slight stiffness in left knee — will note for RN follow-up.</p>
+                        </div>
+                        <div class="clinical-note">
+                            <div class="note-header">
+                                <strong>RN Rachel N.</strong>
+                                <time>April 10, 2026</time>
+                            </div>
+                            <p>Quarterly assessment completed. All care goals being met. Maria's overall health status is stable. Family caregiver Sarah is performing excellently — passed competency review. Recommend continuing current plan of care for next quarter.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ SCHEDULE PAGE ═══════════ -->
+        <div class="page" id="page-schedule">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Schedule</h1>
+                    <p class="page-subtitle">Upcoming and past caregiver visits</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn-portal" onclick="alert('Schedule change request sent to your care coordinator.')">
+                        <i class="fa-solid fa-calendar-plus"></i> Request Change
+                    </button>
+                </div>
+            </div>
+
+            <div class="calendar-header">
+                <button class="cal-nav" id="calPrev"><i class="fa-solid fa-chevron-left"></i></button>
+                <h3 id="calMonthYear">April 2026</h3>
+                <button class="cal-nav" id="calNext"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+
+            <div class="card">
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 28px;">
+                <div class="card-header">
+                    <h3>Weekly Recurring Schedule</h3>
+                </div>
+                <div class="card-body">
+                    <div class="weekly-schedule">
+                        <div class="week-day">
+                            <h5>Monday — Friday</h5>
+                            <div class="week-slots">
+                                <div class="week-slot">
+                                    <span class="slot-time">8:00 AM — 10:00 AM</span>
+                                    <span class="slot-service">Morning Routine</span>
+                                    <span class="slot-cg">Sarah M.</span>
+                                </div>
+                                <div class="week-slot">
+                                    <span class="slot-time">12:30 PM — 2:00 PM</span>
+                                    <span class="slot-service">Midday Care</span>
+                                    <span class="slot-cg">Sarah M.</span>
+                                </div>
+                                <div class="week-slot">
+                                    <span class="slot-time">6:00 PM — 8:00 PM</span>
+                                    <span class="slot-service">Evening Routine</span>
+                                    <span class="slot-cg">Sarah M.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="week-day">
+                            <h5>Saturday — Sunday</h5>
+                            <div class="week-slots">
+                                <div class="week-slot">
+                                    <span class="slot-time">9:00 AM — 11:00 AM</span>
+                                    <span class="slot-service">Morning Routine</span>
+                                    <span class="slot-cg">Sarah M.</span>
+                                </div>
+                                <div class="week-slot">
+                                    <span class="slot-time">5:00 PM — 7:00 PM</span>
+                                    <span class="slot-service">Evening Routine</span>
+                                    <span class="slot-cg">Sarah M.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ DOCUMENTS PAGE ═══════════ -->
+        <div class="page" id="page-documents">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Documents</h1>
+                    <p class="page-subtitle">Your forms, reports, and care documentation</p>
+                </div>
+            </div>
+
+            <div class="docs-grid">
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-medical"></i></div>
+                    <div class="doc-info">
+                        <h4>Care Plan — Q2 2026</h4>
+                        <p>Updated April 14, 2026</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-lines"></i></div>
+                    <div class="doc-info">
+                        <h4>Monthly Assessment — April</h4>
+                        <p>Uploaded April 14, 2026</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="doc-info">
+                        <h4>Visit Summary — March 2026</h4>
+                        <p>62 visits / 186 care hours</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-medical"></i></div>
+                    <div class="doc-info">
+                        <h4>Care Plan — Q1 2026</h4>
+                        <p>January 8, 2026</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-signature"></i></div>
+                    <div class="doc-info">
+                        <h4>Medical Release Form</h4>
+                        <p>Signed December 12, 2025</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="doc-info">
+                        <h4>New Client Enrollment</h4>
+                        <p>Original enrollment packet</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-shield"></i></div>
+                    <div class="doc-info">
+                        <h4>HIPAA Authorization</h4>
+                        <p>Signed December 12, 2025</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="doc-info">
+                        <h4>Visit Summary — February 2026</h4>
+                        <p>58 visits / 174 care hours</p>
+                    </div>
+                    <button class="doc-action"><i class="fa-solid fa-download"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ PROFILE PAGE ═══════════ -->
+        <div class="page" id="page-profile">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Profile</h1>
+                    <p class="page-subtitle">Account and personal information</p>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <div class="card">
+                    <div class="card-header"><h3>Personal Information</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Full Name</label>
+                            <span>Maria Johnson</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Member ID</label>
+                            <span>HHS-2025-0847</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Date of Birth</label>
+                            <span>March 15, 1952</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Phone</label>
+                            <span>(262) 555-0193</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Address</label>
+                            <span>4217 Westfield Ave, Racine, WI 53402</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Emergency Contacts</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Primary Contact</label>
+                            <span>David Johnson (Son) — (262) 555-0284</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Secondary Contact</label>
+                            <span>Lisa Martinez (Daughter) — (262) 555-0371</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Insurance Information</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Coverage</label>
+                            <span>Medicaid / Title 19</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>HMO</label>
+                            <span>Molina Healthcare of Wisconsin</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Member Number</label>
+                            <span>WI-MC-9847362</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Authorized Hours</label>
+                            <span>5.5 hours / day — 38.5 hours / week</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Primary Care Physician</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Physician</label>
+                            <span>Dr. Robert Williams, MD</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Practice</label>
+                            <span>Ascension All Saints — Racine</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Phone</label>
+                            <span>(262) 687-4000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ MESSAGES PAGE ═══════════ -->
+        <div class="page" id="page-messages">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Messages</h1>
+                    <p class="page-subtitle">Secure communication with your care team</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn-portal" onclick="alert('Opening new message composer...')">
+                        <i class="fa-solid fa-pen-to-square"></i> New Message
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="message-list">
+                    <div class="message-item unread">
+                        <div class="msg-avatar rn">RN</div>
+                        <div class="msg-content">
+                            <div class="msg-header">
+                                <strong>Rachel N., RN</strong>
+                                <time>Today, 9:20 AM</time>
+                            </div>
+                            <h4>Care Plan Update — Medication Schedule</h4>
+                            <p>Hi Maria, I've updated your care plan to reflect the new medication times from Dr. Williams. Sarah has been briefed on the changes. Please let me know if you have any questions.</p>
+                        </div>
+                        <span class="unread-dot"></span>
+                    </div>
+                    <div class="message-item unread">
+                        <div class="msg-avatar cc">JD</div>
+                        <div class="msg-content">
+                            <div class="msg-header">
+                                <strong>Jessica D.</strong>
+                                <time>Yesterday, 4:15 PM</time>
+                            </div>
+                            <h4>Quarterly Review Scheduled</h4>
+                            <p>Hi Maria, your quarterly review with RN Rachel has been scheduled for April 22nd at 10:00 AM. She will visit your home for the assessment. Please have your medication list ready.</p>
+                        </div>
+                        <span class="unread-dot"></span>
+                    </div>
+                    <div class="message-item unread">
+                        <div class="msg-avatar">SM</div>
+                        <div class="msg-content">
+                            <div class="msg-header">
+                                <strong>Sarah M.</strong>
+                                <time>Apr 14, 11:00 AM</time>
+                            </div>
+                            <h4>Morning Visit Note</h4>
+                            <p>Good morning Maria! Just a heads up — I'll be arriving about 10 minutes early tomorrow. Also, I picked up the prescription from Walgreens as requested. See you in the morning!</p>
+                        </div>
+                        <span class="unread-dot"></span>
+                    </div>
+                    <div class="message-item">
+                        <div class="msg-avatar rn">RN</div>
+                        <div class="msg-content">
+                            <div class="msg-header">
+                                <strong>Rachel N., RN</strong>
+                                <time>Apr 10, 2:30 PM</time>
+                            </div>
+                            <h4>Assessment Complete</h4>
+                            <p>Maria, your quarterly assessment is complete. Everything looks great — I'm very pleased with your progress. I've uploaded the report to your Documents section.</p>
+                        </div>
+                    </div>
+                    <div class="message-item">
+                        <div class="msg-avatar cc">JD</div>
+                        <div class="msg-content">
+                            <div class="msg-header">
+                                <strong>Jessica D.</strong>
+                                <time>Apr 8, 10:00 AM</time>
+                            </div>
+                            <h4>Welcome to Heritage Connect!</h4>
+                            <p>Hi Maria! Welcome to the Heritage Connect portal. You can use this portal to view your visit history, care plan, upcoming schedule, and securely message your care team. Don't hesitate to reach out if you need help navigating.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="portal.js"></script>
+</body>
+</html>
