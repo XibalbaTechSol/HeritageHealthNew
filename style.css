@@ -452,9 +452,9 @@ h4, h5, h6 {
     max-width: 520px;
     width: 100%;
     height: auto;
-    margin: 0 auto 40px; /* Increased from 24px to account for tighter cropping */
+    margin: 0 auto 64px; /* Increased from 40px to add approx. one line of space */
     opacity: 0;
-    transform: translateY(15px); /* Reduced from 30px for subtler, safer entrance */
+    transform: translateY(15px);
     animation: fadeUp 0.9s var(--ease-out) 0.5s forwards;
     filter: drop-shadow(0 0 2px rgba(10, 31, 58, 0.8));
 }
