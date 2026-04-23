@@ -449,7 +449,7 @@ h4, h5, h6 {
 }
 .hero-logo {
     display: block;
-    max-width: 520px;
+    max-width: 468px; /* Reduced from 520px by 10% */
     width: 100%;
     height: auto;
     margin: 0 auto 64px; /* Increased from 40px to add approx. one line of space */
