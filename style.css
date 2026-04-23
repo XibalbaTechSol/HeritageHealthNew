@@ -776,14 +776,15 @@ h4, h5, h6 {
 .story-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--gap-xl);
+    gap: var(--gap-lg);
     align-items: start;
 }
 
 .story-col p {
     color: var(--text-secondary);
-    line-height: 1.9;
-    margin-bottom: 24px;
+    line-height: 1.75;
+    margin-bottom: 20px;
+    font-size: 0.92rem;
 }
 
 .story-col p:last-child { margin-bottom: 0; }
@@ -791,18 +792,18 @@ h4, h5, h6 {
 .story-highlight {
     background: var(--white);
     border-left: 4px solid var(--gold);
-    padding: 32px 36px;
+    padding: 24px 28px;
     border-radius: 0 var(--r-sm) var(--r-sm) 0;
-    margin: 32px 0;
+    margin: 24px 0;
     box-shadow: var(--shadow-sm);
 }
 
 .story-highlight p {
     font-family: 'Playfair Display', serif;
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-style: italic;
     color: var(--navy);
-    line-height: 1.7;
+    line-height: 1.6;
     margin-bottom: 0;
 }
 
