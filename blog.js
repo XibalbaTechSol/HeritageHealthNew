@@ -4,6 +4,30 @@
  */
 
 const articlesData = {
+    'wkrp-consortium': {
+        title: "Kenosha & Racine Families: Understanding the WKRP Consortium",
+        category: "Medicaid Mastery",
+        date: "May 28, 2026",
+        readTime: "9 min read",
+        image: "fa-users-rectangle",
+        isIcon: true,
+        content: `
+            <h3>Your Local Gateway to Wisconsin Medicaid</h3>
+            <p>If you live in Kenosha or Racine County and are applying for Medicaid, BadgerCare Plus, or FoodShare, you are working with the WKRP (Wisconsin's Kenosha Racine Partners) consortium. WKRP is the multi-county agency responsible for processing applications and determining eligibility for most public assistance programs in our region. At Heritage Health, we view WKRP as a vital partner in the care journey, acting as the administrative foundation upon which your personal care services are built.</p>
+            
+            <h3>What Does WKRP Do?</h3>
+            <p>WKRP manages the "Income Maintenance" (IM) side of your benefits. This means they are the ones who look at your financial situation—your income, your assets, and your household size—to decide if you qualify for Medicaid. They handle the initial application, the annual renewals, and any changes in your circumstances (such as a change in address or income). While Heritage Health provides the clinical care, WKRP ensures that your insurance remains active and compliant with state regulations.</p>
+            
+            <h3>The WKRP Call Center: A Vital Resource</h3>
+            <p>One of the most important tools for families in our area is the WKRP Call Center (1-888-794-5820). This is where you can check the status of your application, report changes, or ask questions about your benefit letters. We often advise families to keep their WKRP case number in a safe place, as you will need it whenever you communicate with the state. Remember, because WKRP is a high-volume agency, it's always best to call early in the morning and have your documentation ready to ensure a smooth interaction.</p>
+            
+            <h3>From Eligibility to Enrollment</h3>
+            <p>The transition from "Applying at WKRP" to "Receiving Care at Heritage Health" is a two-step process. Once WKRP determines you are financially eligible for Medicaid, the next step is determining clinical eligibility. If you require help with daily tasks like bathing or dressing, that is when Heritage Health steps in to provide the RN assessment and the physician-ordered Plan of Care. WKRP ensures you have the "Medicaid Card," and Heritage Health ensures you have the professional support you need to use that benefit safely in your own home.</p>
+            
+            <h3>Coordinating with Your Heritage Team</h3>
+            <p>At Heritage Health, our intake coordinators work closely with families to ensure their WKRP information is up to date. If your Medicaid status lapses due to a missing renewal form at WKRP, your personal care services can be interrupted. That's why we help our clients stay on top of their WKRP correspondence. We view ourselves as your administrative advocates, helping you navigate the WKRP system so that you can focus on your health and your loved ones while we ensure your benefits remain stable and secure.</p>
+        `
+    },
     'pcs-vs-ltc': {
         title: "Personal Care vs. Long-Term Care: Understanding the Clinical Spectrum",
         category: "Clinical Excellence",
