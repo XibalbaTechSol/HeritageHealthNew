@@ -449,14 +449,14 @@ h4, h5, h6 {
 }
 .hero-logo {
     display: block;
-    max-width: 468px; /* Reduced from 520px by 10% */
+    max-width: 420px; /* Reduced further by 10% for maximum sharpness */
     width: 100%;
     height: auto;
-    margin: 0 auto 64px; /* Increased from 40px to add approx. one line of space */
+    margin: 0 auto 64px;
     opacity: 0;
     transform: translateY(15px);
     animation: fadeUp 0.9s var(--ease-out) 0.5s forwards;
-    filter: drop-shadow(0 0 2px rgba(10, 31, 58, 0.8));
+    filter: drop-shadow(0 0 1px rgba(10, 31, 58, 0.9)); /* Tighter, more opaque shadow to seal edges */
 }
 
 .hero-label {
