@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarLinks = document.querySelectorAll('.sidebar-link[data-page]');
     const pages = document.querySelectorAll('.page');
     const gotoLinks = document.querySelectorAll('[data-goto]');
+    const breadcrumbPage = document.getElementById('breadcrumb-page');
 
     function navigateTo(pageId) {
         pages.forEach(p => p.classList.remove('active'));
@@ -14,12 +15,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const link = document.querySelector(`.sidebar-link[data-page="${pageId}"]`);
 
         if (page) page.classList.add('active');
-        if (link) link.classList.add('active');
+        if (link) {
+            link.classList.add('active');
+            // Update Breadcrumb
+            if (breadcrumbPage) {
+                const pageName = link.querySelector('span').textContent;
+                breadcrumbPage.textContent = pageName;
+            }
+        }
 
         // Close mobile sidebar
         document.getElementById('sidebar').classList.remove('open');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Logout Confirmation
+    const logoutBtn = document.querySelector('.sidebar-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            if (!confirm('Are you sure you want to sign out of Heritage Connect?')) {
+                e.preventDefault();
+            }
+        });
     }
 
     sidebarLinks.forEach(link => {
