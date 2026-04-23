@@ -47,7 +47,7 @@
     <!-- ═══════════ FEATURED POST ═══════════ -->
     <section class="featured-post">
         <div class="container">
-            <div class="featured-card">
+            <div class="featured-card reveal" data-article-id="featured-guide">
                 <div class="featured-image">
                     <img src="blog_nurse_rachel_1776921412461.png" alt="Nurse Rachel smiling in a home setting">
                 </div>
@@ -74,7 +74,7 @@
 
             <div class="blog-grid">
                 <!-- Post 1: Video Article -->
-                <article class="blog-card video-post">
+                <article class="blog-card video-post" data-article-id="clinical-oversight">
                     <div class="blog-card-image" style="position: relative;">
                         <img src="blog_nurse_rachel_1776921412461.png" alt="Clinical Oversight Video">
                         <div class="video-play-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
@@ -93,7 +93,7 @@
                 </article>
 
                 <!-- Post 2: Video Article -->
-                <article class="blog-card video-post">
+                <article class="blog-card video-post" data-article-id="get-paid-to-care">
                     <div class="blog-card-image" style="position: relative;">
                         <img src="care-photo.png" alt="Get Paid to Care Video">
                         <div class="video-play-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
@@ -112,7 +112,7 @@
                 </article>
 
                 <!-- Post 3: Forward Health Bulletin -->
-                <article class="blog-card">
+                <article class="blog-card" data-article-id="evv-rules">
                     <div class="blog-card-image" style="background: var(--primary-navy); display: flex; align-items: center; justify-content: center; height: 200px;">
                         <i class="fa-solid fa-file-medical-flag" style="font-size: 4rem; color: var(--accent-gold);"></i>
                     </div>
@@ -128,7 +128,7 @@
                 </article>
 
                 <!-- Post 4: Clinical Advice -->
-                <article class="blog-card">
+                <article class="blog-card" data-article-id="dementia-care">
                     <div class="blog-card-image">
                         <img src="blog_dementia_care_1776921660891.png" alt="Dementia Care Strategies">
                     </div>
@@ -144,7 +144,7 @@
                 </article>
 
                 <!-- Post 5: Caregiver Support -->
-                <article class="blog-card">
+                <article class="blog-card" data-article-id="enrollment-step-by-step">
                     <div class="blog-card-image">
                         <img src="blog_caregiver_choice_1776921688508.png" alt="Family Caregiver Program">
                     </div>
@@ -160,7 +160,7 @@
                 </article>
 
                 <!-- Post 6: Medicaid Guide -->
-                <article class="blog-card">
+                <article class="blog-card" data-article-id="medicaid-qualification">
                     <div class="blog-card-image">
                         <img src="blog_medicaid_guide_1776921431703.png" alt="Understanding Medicaid Title 19">
                     </div>
@@ -174,6 +174,86 @@
                         </div>
                     </div>
                 </article>
+
+                <!-- Post 7: Forward Health Bulletin -->
+                <article class="blog-card" data-article-id="behavioral-health-2027">
+                    <div class="blog-card-image" style="background: var(--primary-navy); display: flex; align-items: center; justify-content: center; height: 200px;">
+                        <i class="fa-solid fa-brain" style="font-size: 4rem; color: var(--accent-gold);"></i>
+                    </div>
+                    <div class="blog-card-content">
+                        <span class="category-tag" style="margin-bottom: 12px; font-size: 0.65rem; background: #e3f2fd; color: #0d47a1;">Forward Health Update</span>
+                        <h3>Forward Health Bulletin: Behavioral Health Integration 2027</h3>
+                        <p>New state mandates for incorporating mental health screenings into personal care assessments to support holistic patient well-being.</p>
+                        <div class="blog-meta">
+                            <span><i class="fa-regular fa-calendar"></i> April 28, 2026</span>
+                            <span><i class="fa-regular fa-clock"></i> 7 min read</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 8: Advanced EVV -->
+                <article class="blog-card" data-article-id="smart-care-evv">
+                    <div class="blog-card-image" style="background: var(--primary-navy); display: flex; align-items: center; justify-content: center; height: 200px;">
+                        <i class="fa-solid fa-mobile-screen-button" style="font-size: 4rem; color: var(--accent-gold);"></i>
+                    </div>
+                    <div class="blog-card-content">
+                        <span class="category-tag" style="margin-bottom: 12px; font-size: 0.65rem;">Medicaid Mastery</span>
+                        <h3>Advanced EVV: Preparing for 2027 'Smart-Care' Mandates</h3>
+                        <p>A deep dive into the upcoming shift from volume-based to value-based care reporting requirements for all Wisconsin PCWs.</p>
+                        <div class="blog-meta">
+                            <span><i class="fa-regular fa-calendar"></i> April 30, 2026</span>
+                            <span><i class="fa-regular fa-clock"></i> 9 min read</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 9: DHS Transition Guidelines -->
+                <article class="blog-card" data-article-id="transition-guidelines-2027">
+                    <div class="blog-card-image" style="background: var(--navy); display: flex; align-items: center; justify-content: center; height: 200px;">
+                        <i class="fa-solid fa-house-medical-circle-check" style="font-size: 4rem; color: var(--gold);"></i>
+                    </div>
+                    <div class="blog-card-content">
+                        <span class="category-tag" style="margin-bottom: 12px; font-size: 0.65rem;">Clinical Excellence</span>
+                        <h3>2027 DHS Facility-to-Home Transition Guidelines</h3>
+                        <p>Understanding the new 'Golden 72 Hours' protocol for patients returning home from skilled nursing facilities in Southeast Wisconsin.</p>
+                        <div class="blog-meta">
+                            <span><i class="fa-regular fa-calendar"></i> May 5, 2026</span>
+                            <span><i class="fa-regular fa-clock"></i> 12 min read</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 10: IRIS vs Family Care -->
+                <article class="blog-card" data-article-id="iris-vs-family-care">
+                    <div class="blog-card-image" style="background: var(--navy); display: flex; align-items: center; justify-content: center; height: 200px;">
+                        <i class="fa-solid fa-scale-balanced" style="font-size: 4rem; color: var(--gold);"></i>
+                    </div>
+                    <div class="blog-card-content">
+                        <span class="category-tag" style="margin-bottom: 12px; font-size: 0.65rem;">Medicaid Mastery</span>
+                        <h3>IRIS vs. Family Care: Navigating Your Options in Wisconsin</h3>
+                        <p>A deep dive into the two primary paths for long-term care in Wisconsin, helping you choose the model that best fits your family's needs.</p>
+                        <div class="blog-meta">
+                            <span><i class="fa-regular fa-calendar"></i> May 10, 2026</span>
+                            <span><i class="fa-regular fa-clock"></i> 12 min read</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Post 11: Spousal Impoverishment -->
+                <article class="blog-card" data-article-id="spousal-impoverishment">
+                    <div class="blog-card-image" style="background: var(--navy); display: flex; align-items: center; justify-content: center; height: 200px;">
+                        <i class="fa-solid fa-shield-halved" style="font-size: 4rem; color: var(--gold);"></i>
+                    </div>
+                    <div class="blog-card-content">
+                        <span class="category-tag" style="margin-bottom: 12px; font-size: 0.65rem;">Medicaid Mastery</span>
+                        <h3>Medicaid Spousal Impoverishment Rules: Protecting Assets</h3>
+                        <p>Learn how Wisconsin's income and asset protection rules ensure that a healthy spouse is not left in poverty when their partner needs care.</p>
+                        <div class="blog-meta">
+                            <span><i class="fa-regular fa-calendar"></i> May 15, 2026</span>
+                            <span><i class="fa-regular fa-clock"></i> 10 min read</span>
+                        </div>
+                    </div>
+                </article>
             </div>
 
             <div class="text-center" style="margin-top: 60px;">
@@ -181,6 +261,32 @@
             </div>
         </div>
     </section>
+
+    <!-- ═══════════ ARTICLE MODAL ═══════════ -->
+    <div id="articleModal" class="article-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <button class="modal-close" aria-label="Close Article"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-scrollable">
+                <div class="modal-featured-image"></div>
+                <div class="modal-inner-content">
+                    <div class="modal-meta-top">
+                        <span class="category-tag modal-category">Category</span>
+                        <h2 class="modal-title">Article Title</h2>
+                        <div class="modal-meta-row">
+                            <span class="modal-date"><i class="fa-regular fa-calendar"></i> Date</span>
+                            <span class="modal-read-time"><i class="fa-regular fa-clock"></i> Read Time</span>
+                        </div>
+                    </div>
+                    <div class="modal-body-inner">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ═══════════ NEWSLETTER ═══════════ -->
     <section class="blog-newsletter">
@@ -197,24 +303,33 @@
         </div>
     </section>
 
+    <!-- ═══════════ PRE-FOOTER CTA ═══════════ -->
+    <section class="pre-footer">
+        <div class="container">
+            <div class="cta-banner reveal">
+                <div class="cta-banner-content">
+                    <h2>Ready to get started?</h2>
+                    <p>Request your free home assessment today and discover how Heritage Health can support your family's care journey.</p>
+                </div>
+                <a href="index.html#assessment" class="btn btn-primary">Schedule Assessment</a>
+            </div>
+        </div>
+    </section>
+
     <!-- ═══════════ FOOTER ═══════════ -->
     <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <img src="logo-header-dark.png" alt="Heritage Health Services" class="footer-logo-img">
+                    <img src="logo-hero-white-gold.png" alt="Heritage Health Services" class="footer-logo-img">
                     <p>Heritage Health Services is Southeast Wisconsin's premier personal care agency. We are dedicated to providing ethical, transparent, and compassionate care while honoring the independence of every client we serve.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
                 </div>
-                <div>
-                    <h6 class="footer-heading">Quick Links</h6>
-                    <ul class="footer-links">
-                        <li><a href="index.html#home">Home</a></li>
-                        <li><a href="index.html#about">About Us</a></li>
-                        <li><a href="index.html#paid-to-care">Get Paid to Care</a></li>
-                        <li><a href="index.html#services">Services</a></li>
-                        <li><a href="index.html#assessment">New Clients</a></li>
-                    </ul>
-                </div>
+
                 <div>
                     <h6 class="footer-heading">Resources</h6>
                     <ul class="footer-links">
@@ -285,6 +400,7 @@
         <span class="call-text">Call (262) 554-8800</span>
     </a>
 
-    <script src="main.js"></script>
+    <script src="./main.js"></script>
+    <script src="./blog.js"></script>
 </body>
 </html>
