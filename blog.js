@@ -4,6 +4,30 @@
  */
 
 const articlesData = {
+    'pcs-vs-ltc': {
+        title: "Personal Care vs. Long-Term Care: Understanding the Clinical Spectrum",
+        category: "Clinical Excellence",
+        date: "May 25, 2026",
+        readTime: "13 min read",
+        image: "fa-stethoscope",
+        isIcon: true,
+        content: `
+            <h3>Clarifying the Terminology of Home Health</h3>
+            <p>In the world of Wisconsin Medicaid, "Personal Care" and "Long-Term Care" are often used interchangeably by families, but they represent two very different clinical and administrative paths. Understanding this distinction is vital for ensuring your loved one receives the correct level of support. As a Registered Nurse, I see how this confusion can lead to gaps in care or frustration during the enrollment process. At Heritage Health, we believe that clinical transparency starts with clear definitions.</p>
+            
+            <h3>Personal Care Services (PCS): The "Medical Card" Benefit</h3>
+            <p>Personal Care Services (PCS) are what we call a "Medicaid Card Service." This is a standard benefit available to anyone on Medicaid who has a "medical necessity" for help with Activities of Daily Living (ADLs). This includes essential tasks like bathing, dressing, grooming, and mobility. The focus of PCS is strictly medical and functional. It is an "entitlement" benefit, meaning if you meet the clinical criteria, there are no waitlists. It is always directed by a licensed agency like Heritage Health and must be supervised by a Registered Nurse.</p>
+            
+            <h3>Long-Term Care: The Comprehensive Support System</h3>
+            <p>Long-Term Care (LTC) refers to broader programs like Family Care and IRIS. These programs are designed for individuals who require a "Nursing Home Level of Care" to remain in the community. LTC covers everything that PCS does, but adds a massive spectrum of non-medical supports, including home modifications, specialized medical equipment, transportation, and vocational training. While PCS focuses on the *task* of caring for the person, Long-Term Care focuses on the *environment* and *lifestyle* that allows the person to stay out of a facility.</p>
+            
+            <h3>The Level of Care Distinction</h3>
+            <p>The primary clinical difference lies in the "Functional Screen." To qualify for PCS, you simply need a physician’s order and an RN assessment proving you need help with ADLs due to a medical condition. To qualify for Long-Term Care (Family Care/IRIS), you must undergo a more rigorous screen through the ADRC to prove that without these services, you would require placement in a nursing home. This higher threshold of need opens the door to the broader range of LTC benefits and specialized asset protection rules.</p>
+            
+            <h3>How They Work Together at Heritage Health</h3>
+            <p>It’s important to know that you don't always have to choose one or the other. Many Heritage Health clients are enrolled in a Long-Term Care program (like IRIS) but receive their actual Personal Care Services through our agency. In this model, the LTC program handles the "big picture" of your life, while Heritage Health provides the dedicated, RN-supervised staff that handles your daily medical and functional needs. We act as the clinical anchor within your broader long-term care plan, ensuring that the highest standards of safety and professionalism are maintained in your home.</p>
+        `
+    },
     'mapp-program': {
         title: "Working with a Disability: A Guide to the Wisconsin MAPP Program",
         category: "Medicaid Mastery",
