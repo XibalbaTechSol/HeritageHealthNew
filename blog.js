@@ -4,6 +4,30 @@
  */
 
 const articlesData = {
+    'mapp-program': {
+        title: "Working with a Disability: A Guide to the Wisconsin MAPP Program",
+        category: "Medicaid Mastery",
+        date: "May 22, 2026",
+        readTime: "14 min read",
+        image: "fa-briefcase-medical",
+        isIcon: true,
+        content: `
+            <h3>Empowering Employment and Healthcare</h3>
+            <p>For many Wisconsin residents with disabilities, the fear of losing essential Medicaid coverage is a primary barrier to returning to the workforce. Traditional Medicaid has strict income and asset limits that can make career advancement feel like a financial risk. The Medicaid Purchase Plan (MAPP) was designed to eliminate this barrier. It allows individuals with disabilities to work, earn a competitive income, and save for the future while maintaining the comprehensive healthcare and personal care services they need to stay independent.</p>
+            
+            <h3>High Asset & Income Limits: The MAPP Advantage</h3>
+            <p>The most significant advantage of MAPP is its generous financial thresholds. In 2026, the individual asset limit is $15,000—a massive increase compared to the $2,000 limit found in many other Medicaid programs. Furthermore, MAPP allows for an adjusted family income of up to 250% of the Federal Poverty Level ($3,325/month for an individual). This higher ceiling ensures that a promotion or a pay raise doesn't automatically trigger a loss of benefits, providing a stable foundation for professional growth.</p>
+            
+            <h3>Independence Accounts: Saving for the Future</h3>
+            <p>MAPP goes a step further in encouraging financial independence through "Independence Accounts." These are registered accounts where you can save up to 50% of your gross job earnings. The most critical feature? Money in these accounts does *not* count toward the $15,000 asset limit. Whether you are saving for a modified vehicle, a home down payment, or long-term retirement, MAPP allows you to build wealth without jeopardizing your access to RN-led personal care and medical coverage.</p>
+            
+            <h3>The Work Requirement & HEC</h3>
+            <p>To qualify for MAPP, you must be "working," but Wisconsin defines this broadly. This includes traditional employment, self-employment, and even "in-kind" work. For those who aren't currently working but have a goal to do so, the Health and Employment Counseling (HEC) program provides a 12-month bridge, allowing you to access MAPP benefits while you actively look for a job. This proactive approach ensures that the healthcare you need is in place *before* you start your first day of work.</p>
+            
+            <h3>MAPP and Personal Care Support</h3>
+            <p>At Heritage Health, we see how MAPP transforms lives. Most MAPP members who require personal care also enroll in Family Care or IRIS. Because MAPP handles the financial eligibility, members typically have a $0 cost-share for their long-term care services as long as they pay their monthly MAPP premium. This integration allows you to focus on your career and your community, knowing that your personal care support is fully funded and professionally managed by the Heritage team.</p>
+        `
+    },
     'straight-vs-hmo': {
         title: "Straight Title 19 vs. Medicaid HMO: Understanding the Difference",
         category: "Medicaid Mastery",
