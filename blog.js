@@ -4,6 +4,30 @@
  */
 
 const articlesData = {
+    'adrc-racine': {
+        title: "Navigating Your Options: The ADRC of Racine County",
+        category: "Caregiver Support",
+        date: "June 1, 2026",
+        readTime: "10 min read",
+        image: "fa-building-columns",
+        isIcon: true,
+        content: `
+            <h3>The Central Hub for Racine County Residents</h3>
+            <p>For families in Mt. Pleasant, Sturtevant, and the city of Racine, the Aging and Disability Resource Center (ADRC) of Racine County is the single most important resource for navigating long-term care. Located at 14200 Washington Ave in Sturtevant, the ADRC serves as the official gateway to publicly funded services. Whether you are an older adult, an individual with a physical or developmental disability, or a family caregiver, the ADRC provides the unbiased information and assistance needed to make informed decisions about your future.</p>
+            
+            <h3>The First Step in the Medicaid Journey</h3>
+            <p>If you are considering home care services through Heritage Health, your journey almost always begins at the ADRC. They are responsible for conducting the "Long-Term Care Functional Screen," which determines if you meet the clinical level of care required for programs like Family Care or IRIS. The ADRC’s Options Counselors work with you to evaluate your needs and explain the differences between various managed care and self-directed paths, ensuring that you choose the program that best fits your lifestyle and goals.</p>
+            
+            <h3>Benefit Specialists: Your Personal Advocates</h3>
+            <p>Navigating the complexities of Social Security, Medicare, and Medicaid can be overwhelming. The ADRC of Racine County provides access to highly trained Benefit Specialists who act as your personal advocates. These specialists can help you understand your rights, assist with application paperwork, and even help you appeal a denial of benefits. Having a local expert who understands both state and federal regulations is a massive advantage for families trying to secure the funding needed for professional in-home care.</p>
+            
+            <h3>Support Beyond Healthcare</h3>
+            <p>The ADRC's mission extends far beyond clinical eligibility. They manage a wide range of community programs that support independence and well-being. This includes the Meals on Wheels program, specialized transportation services, and a robust "Caregiver Support" system that offers education and respite options for those on the front lines of care. They also host wellness classes like "Stepping On" (fall prevention) and provides dedicated resources for families living with dementia. At Heritage Health, we view the ADRC as a vital partner in our mission to keep Racine County residents safe, healthy, and independent in their own homes.</p>
+            
+            <h3>How to Contact the ADRC of Racine County</h3>
+            <p>You can reach the ADRC of Racine County by phone at 262-833-8777 or toll-free at 1-866-219-1043. Their office is open Monday through Friday from 8:00 AM to 4:30 PM. We always recommend that families call to schedule an appointment before visiting their Sturtevant location to ensure they get dedicated time with a counselor. Remember, the ADRC is a free and unbiased service—their only goal is to help you find the resources you need to thrive.</p>
+        `
+    },
     'wkrp-consortium': {
         title: "Kenosha & Racine Families: Understanding the WKRP Consortium",
         category: "Medicaid Mastery",
