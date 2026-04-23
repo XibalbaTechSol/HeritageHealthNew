@@ -452,7 +452,7 @@ h4, h5, h6 {
     max-width: 420px; /* Reduced further by 10% for maximum sharpness */
     width: 100%;
     height: auto;
-    margin: 0 auto 64px;
+    margin: 0 auto 16px;
     opacity: 0;
     transform: translateY(15px);
     animation: fadeUp 0.9s var(--ease-out) 0.5s forwards;
@@ -503,7 +503,7 @@ h4, h5, h6 {
     line-height: 1.8;
     color: rgba(255, 255, 255, 0.85); /* Increased contrast */
     max-width: 600px;
-    margin: 0 auto 40px; /* Removed top margin */
+    margin: -12px auto 40px; /* Pull description into the logo's internal whitespace */
     opacity: 0;
     transform: translateY(15px);
     animation: fadeUp 0.8s var(--ease-out) 0.7s forwards;
