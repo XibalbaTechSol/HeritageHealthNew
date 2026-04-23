@@ -4,6 +4,30 @@
  */
 
 const articlesData = {
+    'straight-vs-hmo': {
+        title: "Straight Title 19 vs. Medicaid HMO: Understanding the Difference",
+        category: "Medicaid Mastery",
+        date: "May 20, 2026",
+        readTime: "11 min read",
+        image: "fa-code-compare",
+        isIcon: true,
+        content: `
+            <h3>The Core Distinction: Administration vs. Eligibility</h3>
+            <p>One of the most frequent points of confusion for Wisconsin families is the difference between "Straight Title 19" (Fee-for-Service Medicaid) and a Medicaid Health Maintenance Organization (HMO). It's important to understand that both are Medicaid programs with the same basic eligibility requirements. The difference lies entirely in how your care is managed and how providers are paid. At Heritage Health, we work with both models, but the clinical coordination required for each varies significantly.</p>
+            
+            <h3>Straight Title 19: The Traditional Model</h3>
+            <p>Straight Title 19, or Fee-for-Service (FFS) Medicaid, is the traditional way the state pays for care. In this model, you can see any provider in Wisconsin that accepts Medicaid, and the state pays that provider directly for each service they deliver. There is no "middleman" insurance company. For many, this offers the widest possible network of doctors. However, it requires the family to be much more proactive in coordinating their own care, as there is no assigned HMO case manager to help bridge the gaps between different medical providers.</p>
+            
+            <h3>Medicaid HMOs: The Managed Care Model</h3>
+            <p>A Medicaid HMO is a private insurance company (like iCare, My Choice Wisconsin, or UnitedHealthcare) that the state pays to manage your care. When you are in an HMO, you must generally stay within that company’s network of doctors and hospitals. The HMO receives a set monthly fee from the state to provide all of your necessary medical services. The primary benefit of an HMO is managed coordination—you often have access to a dedicated case manager who can help authorize services and ensure your various specialists are communicating with each other.</p>
+            
+            <h3>How it Affects Personal Care Services</h3>
+            <p>From a personal care perspective, the main difference is the authorization process. For Straight Title 19, Heritage Health coordinates directly with a state-contracted agency to verify clinical necessity. For an HMO, we work directly with the insurance company's utilization management team. Some HMOs offer additional "value-added" benefits that Straight Medicaid does not, such as specialized wellness programs or increased transportation support. Our clinical team is expert at navigating the specific paperwork and authorization requirements for every major HMO in Southeast Wisconsin.</p>
+            
+            <h3>Choosing What's Best for Your Family</h3>
+            <p>In most parts of Wisconsin, including Milwaukee and Racine counties, Medicaid recipients are required to choose an HMO unless they meet specific exemption criteria. However, certain "carve-out" services might still be paid via Straight Title 19 even if you are in an HMO. This complexity is why we recommend speaking with a Heritage Health coordinator or an ADRC specialist before making a change. We can help you look at your current doctors and your specific care needs to determine which model—managed or traditional—will provide the most seamless and supportive experience for your loved one.</p>
+        `
+    },
     'featured-guide': {
         title: "The Family Caregiver's Guide to Wisconsin Medicaid (2026 Edition)",
         category: "Medicaid Mastery",
