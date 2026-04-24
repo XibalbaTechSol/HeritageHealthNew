@@ -70,16 +70,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Generate PDFs on the fly using stored Firestore data
                 const files = await generateClientPacket(cachedUserData);
                 
-                // For this demo, we'll download the first one (Referral) 
-                // or we could merge them. Let's download all 3.
-                for (const file of files) {
+                // For this download, we trigger the first file (Combined Referral)
+                if (files && files.length > 0) {
+                    const file = files[0];
                     const blob = new Blob([file.bytes], { type: 'application/pdf' });
                     const url = URL.createObjectURL(blob);
                     const link = document.getElementById('pdfDownloadLink');
-                    link.href = url;
-                    link.download = file.name;
-                    link.click();
-                    URL.revokeObjectURL(url);
+                    if (link) {
+                        link.href = url;
+                        link.download = file.name;
+                        link.click();
+                        URL.revokeObjectURL(url);
+                    }
                 }
             } catch (err) {
                 console.error("PDF View Error:", err);
