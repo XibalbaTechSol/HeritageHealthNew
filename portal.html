@@ -411,9 +411,28 @@
                     <button class="btn-portal-outline" id="syncGoogleCalendar">
                         <i class="fa-brands fa-google"></i> Sync Google Calendar
                     </button>
-                    <button class="btn-portal" onclick="alert('Schedule change request sent to your care coordinator.')">
-                        <i class="fa-solid fa-calendar-plus"></i> Request Change
+                    <button class="btn-portal" id="openNurseScheduler">
+                        <i class="fa-solid fa-user-nurse"></i> Schedule Nurse Visit
                     </button>
+                </div>
+            </div>
+
+            <div class="clinical-milestones card" style="margin-bottom: 28px; border-left: 4px solid var(--gold);">
+                <div class="card-body" style="display: flex; gap: 30px; align-items: center; padding: 20px;">
+                    <div>
+                        <h4 style="margin: 0; color: var(--navy);">Clinical Assessment Tracking</h4>
+                        <p style="margin: 5px 0 0; font-size: 0.85rem; color: var(--text-muted);">Smart reminders for your recurring nursing reviews.</p>
+                    </div>
+                    <div class="milestone-badges" style="display: flex; gap: 15px;">
+                        <div class="milestone-badge" id="milestone-60">
+                            <span class="label">60-Day Review</span>
+                            <span class="date" id="date-60">Calculating...</span>
+                        </div>
+                        <div class="milestone-badge" id="milestone-90">
+                            <span class="label">90-Day Assessment</span>
+                            <span class="date" id="date-90">Calculating...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -601,33 +620,41 @@
         </div>
     </div>
 
-    <!-- Message Composer Modal -->
-    <div id="messageModal" class="modal-overlay-custom">
-        <div class="modal-container-custom">
+    <!-- Nurse Visit Scheduler Modal -->
+    <div id="nurseSchedulerModal" class="modal-overlay-custom">
+        <div class="modal-container-custom" style="max-width: 500px;">
             <div class="modal-header-custom">
-                <h3>New Secure Message</h3>
-                <button class="close-modal-custom" id="closeMessageComposer">&times;</button>
+                <h3>Schedule Nursing Visit</h3>
+                <button class="close-modal-custom" id="closeNurseScheduler">&times;</button>
             </div>
-            <form id="messageForm" class="modal-body-custom">
+            <form id="nurseSchedulerForm" class="modal-body-custom">
                 <div class="form-group">
-                    <label>Recipient</label>
-                    <select name="recipient" class="form-input-custom">
-                        <option value="coordinator">Jessica D. (Care Coordinator)</option>
-                        <option value="nurse">Rachel N., RN (Supervising Nurse)</option>
-                        <option value="billing">Billing Department</option>
+                    <label>Visit Type</label>
+                    <select name="visitType" class="form-input-custom" required>
+                        <option value="60-day">60-Day Recertification</option>
+                        <option value="90-day">90-Day Clinical Assessment</option>
+                        <option value="supervisory">Nurse Supervisory Visit</option>
+                        <option value="change-of-condition">Change of Condition Review</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Subject</label>
-                    <input type="text" name="subject" class="form-input-custom" required placeholder="e.g., Schedule Change Request">
+                    <label>Preferred Date</label>
+                    <input type="date" name="preferredDate" class="form-input-custom" required>
                 </div>
                 <div class="form-group">
-                    <label>Message</label>
-                    <textarea name="body" class="form-input-custom" style="height: 150px;" required placeholder="Type your secure message here..."></textarea>
+                    <label>Time Preference</label>
+                    <select name="preferredTime" class="form-input-custom">
+                        <option value="morning">Morning (8 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Special Instructions</label>
+                    <textarea name="notes" class="form-input-custom" style="height: 80px;" placeholder="Any specific clinical concerns..."></textarea>
                 </div>
                 <div class="modal-footer-custom">
-                    <button type="button" class="btn-outline-custom" id="cancelMessage">Cancel</button>
-                    <button type="submit" class="btn-primary-custom">Send Message</button>
+                    <button type="button" class="btn-outline-custom" id="cancelNurseScheduler">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Request Visit</button>
                 </div>
             </form>
         </div>

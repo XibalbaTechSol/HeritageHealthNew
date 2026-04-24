@@ -1,6 +1,6 @@
 /**
  * PORTAL LOGIC — Heritage Connect
- * FULL PRODUCTION SUITE: Auth, Firestore Sync, Profile Editing, Messaging, Google Calendar, Notifications & Logs.
+ * FULL PRODUCTION SUITE: Auth, Firestore Sync, Profile Editing, Messaging, Google Calendar, Notifications, & Clinical Scheduler.
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -57,16 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Fetch & Sync Profile
         const userDocRef = doc(db, "clients", user.uid);
         onSnapshot(userDocRef, (snap) => {
             if (snap.exists()) {
                 cachedUserData = snap.data();
                 updateUIWithUserData(cachedUserData);
+                calculateClinicalMilestones(cachedUserData);
             }
         });
 
-        // 2. Initialize Real-Time Systems
         initMessaging(user.uid);
         initNotifications(user.uid);
         initActivityLogs(user.uid);
@@ -102,12 +101,83 @@ document.addEventListener('DOMContentLoaded', () => {
         setField('prof-status', data.status || "Active");
     }
 
+    // ─── CLINICAL MILESTONES (SMART NOTIFICATIONS) ───
+    function calculateClinicalMilestones(userData) {
+        if (!userData.submittedAt) return;
+
+        const start = userData.submittedAt.toDate();
+        const date60 = new Date(start); date60.setDate(date60.getDate() + 60);
+        const date90 = new Date(start); date90.setDate(date90.getDate() + 90);
+
+        const now = new Date();
+        const el60 = document.getElementById('date-60');
+        const el90 = document.getElementById('date-90');
+        const badge60 = document.getElementById('milestone-60');
+        const badge90 = document.getElementById('milestone-90');
+
+        if (el60) el60.textContent = date60.toLocaleDateString();
+        if (el90) el90.textContent = date90.toLocaleDateString();
+
+        // Smart Styling
+        if (date60 < now) badge60.classList.add('overdue');
+        else if (date60 - now < 7 * 24 * 60 * 60 * 1000) badge60.classList.add('due-soon');
+
+        if (date90 < now) badge90.classList.add('overdue');
+        else if (date90 - now < 7 * 24 * 60 * 60 * 1000) badge90.classList.add('due-soon');
+    }
+
+    // ─── NURSE SCHEDULER ───
+    const schedulerModal = document.getElementById('nurseSchedulerModal');
+    const schedulerForm = document.getElementById('nurseSchedulerForm');
+
+    document.getElementById('openNurseScheduler')?.addEventListener('click', () => schedulerModal.classList.add('active'));
+    document.getElementById('closeNurseScheduler')?.addEventListener('click', () => schedulerModal.classList.remove('active'));
+    document.getElementById('cancelNurseScheduler')?.addEventListener('click', () => schedulerModal.classList.remove('active'));
+
+    schedulerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(schedulerForm);
+        const requestData = {
+            ...Object.fromEntries(formData.entries()),
+            clientId: auth.currentUser.uid,
+            clientName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
+            status: "Pending Approval",
+            timestamp: serverTimestamp()
+        };
+
+        try {
+            await addDoc(collection(db, "nurse_visits"), requestData);
+            
+            // Create Activity Log
+            await addDoc(collection(db, "activity"), {
+                userId: auth.currentUser.uid,
+                title: "Nurse Visit Requested",
+                body: `Scheduled a ${requestData.visitType} for ${requestData.preferredDate}.`,
+                timestamp: serverTimestamp(),
+                color: "#C9A84C"
+            });
+
+            // Create Notification
+            await addDoc(collection(db, "notifications"), {
+                userId: auth.currentUser.uid,
+                title: "Visit Request Received",
+                body: `Your request for a ${requestData.visitType} is being reviewed.`,
+                timestamp: serverTimestamp(),
+                read: false,
+                icon: "fa-user-nurse"
+            });
+
+            schedulerModal.classList.remove('active');
+            schedulerForm.reset();
+            alert("Nurse visit request submitted. Your care coordinator will contact you to confirm.");
+        } catch (err) { alert(err.message); }
+    });
+
     // ─── NOTIFICATIONS SYSTEM ───
     function initNotifications(uid) {
         const notifDot = document.getElementById('notifDot');
         const notifList = document.getElementById('notifList');
         const q = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(10));
-
         onSnapshot(q, (snap) => {
             let unreadCount = 0;
             if (snap.empty) {
@@ -115,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 notifDot.style.display = 'none';
                 return;
             }
-
             notifList.innerHTML = '';
             snap.forEach(doc => {
                 const n = doc.data();
@@ -132,18 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 notifList.appendChild(item);
             });
-
             notifDot.style.display = unreadCount > 0 ? 'block' : 'none';
         });
-
-        // Dropdown toggle
         const bell = document.getElementById('notifBell');
         const dropdown = document.getElementById('notifDropdown');
-        bell?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdown.classList.toggle('active');
-        });
-
+        bell?.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('active'); });
         document.addEventListener('click', () => dropdown.classList.remove('active'));
     }
 
@@ -151,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function initActivityLogs(uid) {
         const feed = document.getElementById('realActivityFeed');
         const q = query(collection(db, "activity"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(8));
-
         onSnapshot(q, (snap) => {
             if (snap.empty) {
                 feed.innerHTML = '<div class="text-center" style="padding: 20px; color: var(--text-muted);">No recent activity.</div>';
@@ -179,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function initVisitLog(uid) {
         const table = document.getElementById('visitTableBody');
         const q = query(collection(db, "visits"), where("clientId", "==", uid), orderBy("date", "desc"));
-
         onSnapshot(q, (snap) => {
             if (snap.empty) {
                 table.innerHTML = '<tr><td colspan="7" class="text-center">No visit records found.</td></tr>';
@@ -207,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── PROFILE EDITING ───
     const editModal = document.getElementById('editProfileModal');
     const editForm = document.getElementById('editProfileForm');
-
     document.getElementById('openEditProfile')?.addEventListener('click', () => {
         if (!cachedUserData) return;
         Object.keys(cachedUserData).forEach(key => {
@@ -216,17 +275,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         editModal.classList.add('active');
     });
-
     document.getElementById('closeEditProfile')?.addEventListener('click', () => editModal.classList.remove('active'));
     document.getElementById('cancelEditProfile')?.addEventListener('click', () => editModal.classList.remove('active'));
-
     editForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(editForm);
         const updates = Object.fromEntries(formData.entries());
         try {
             await setDoc(doc(db, "clients", auth.currentUser.uid), updates, { merge: true });
-            // Add activity log for the edit
             await addDoc(collection(db, "activity"), {
                 userId: auth.currentUser.uid,
                 title: "Profile Updated",
@@ -275,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('openMessageComposer')?.addEventListener('click', () => msgModal.classList.add('active'));
     document.getElementById('closeMessageComposer')?.addEventListener('click', () => msgModal.classList.remove('active'));
     document.getElementById('cancelMessage')?.addEventListener('click', () => msgModal.classList.remove('active'));
-
     msgForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(msgForm);
@@ -291,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         try {
             await addDoc(collection(db, "messages"), newMsg);
-            // Add activity log
             await addDoc(collection(db, "activity"), {
                 userId: auth.currentUser.uid,
                 title: "Message Sent",
@@ -305,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { alert(err.message); }
     });
 
-    // ─── GOOGLE CALENDAR INTEGRATION ───
+    // ─── GOOGLE CALENDAR ───
     const syncBtn = document.getElementById('syncGoogleCalendar');
     syncBtn?.addEventListener('click', async () => {
         try {
@@ -316,11 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?access_token=${token}`);
             const data = await response.json();
             if (data.items) {
-                googleEvents = data.items.map(item => ({
-                    title: item.summary,
-                    start: item.start.dateTime || item.start.date,
-                    type: 'google'
-                }));
+                googleEvents = data.items.map(item => ({ title: item.summary, start: item.start.dateTime || item.start.date }));
                 renderCalendar(3, 2026);
                 alert(`Successfully synced ${googleEvents.length} events.`);
             }
@@ -395,7 +445,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.download = file.name;
                     link.click();
                     URL.revokeObjectURL(url);
-                    // Add activity log
                     await addDoc(collection(db, "activity"), {
                         userId: auth.currentUser.uid,
                         title: "Document Downloaded",

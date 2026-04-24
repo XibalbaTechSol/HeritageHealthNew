@@ -1646,3 +1646,40 @@ button { font-family: inherit; }
     margin-top: 4px;
 }
 
+
+/* ═══════════ CLINICAL MILESTONES ═══════════ */
+.milestone-badge {
+    padding: 10px 18px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+}
+
+.milestone-badge .label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.milestone-badge .date {
+    font-size: 1rem;
+    color: var(--navy);
+    font-weight: 700;
+}
+
+.milestone-badge.due-soon {
+    border-color: #FACC15;
+    background: rgba(250, 204, 21, 0.05);
+}
+
+.milestone-badge.overdue {
+    border-color: #EF4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
