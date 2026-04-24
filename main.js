@@ -1,25 +1,7 @@
 /**
  * MAIN INTERACTION LOGIC — Heritage Health Services
- * Handles UI elements, scroll effects, and Firebase Auth for Sign-In.
+ * Handles UI, scroll effects, and Dual-Mode Clinical Chatbot.
  */
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-// ─── CONFIGURATION ───
-const firebaseConfig = {
-  apiKey: "AIzaSyA3CvTjZ03mg0yjqK8WW-doRb7vcCP-cHQ",
-  authDomain: "hhs-new.firebaseapp.com",
-  projectId: "hhs-new",
-  storageBucket: "hhs-new.firebasestorage.app",
-  messagingSenderId: "996139618301",
-  appId: "1:996139618301:web:6b2326edda6968f809d394",
-  measurementId: "G-Q8NZ603J99"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -81,31 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ─── Portal Sign-In (Real Firebase Auth) ───
-    const portalForm = document.getElementById('portalForm');
-    if (portalForm) {
-        portalForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = portalForm.querySelector('input[type="email"]').value;
-            const password = portalForm.querySelector('input[type="password"]').value;
-            const btn = portalForm.querySelector('button[type="submit"]');
-
-            const originalBtnText = btn.textContent;
-            btn.textContent = 'Verifying Account...';
-            btn.disabled = true;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = 'portal.html';
-            } catch (err) {
-                console.error("Auth Error:", err);
-                alert("Sign-In Failed: " + err.message);
-                btn.textContent = originalBtnText;
-                btn.disabled = false;
-            }
-        });
-    }
-
     // ─── Chatbot ───
     const chatBubble = document.getElementById('chatBubble');
     const chatWindow = document.getElementById('chatWindow');
@@ -137,10 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function callGemini(msg) {
+    // --- LOCAL MODE: REAL AI (Standard Fetch API) ---
+    async function callGeminiLocal(msg) {
         let key = sessionStorage.getItem('HHS_CHAT_KEY');
         if (!key) {
-            key = prompt("Real AI Engine Detected (Local Only). Please enter your Gemini API Key:");
+            key = prompt("Real AI Mode (Local Only). Please enter your Gemini API Key:");
             if (key) sessionStorage.setItem('HHS_CHAT_KEY', key);
             else return null;
         }
@@ -149,7 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const resp = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${msg}` }] }] })
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser: ${msg}` }] }]
+                })
             });
             const data = await resp.json();
             return data.candidates[0].content.parts[0].text;
@@ -159,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- PRODUCTION MODE: FALLBACK ---
     function getClinicalResponse(msg) {
         const lower = msg.toLowerCase();
         if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
@@ -167,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (lower.includes('assessment') || lower.includes('start') || lower.includes('enroll')) {
             return "Our enrollment process starts with a free in-home nursing assessment. We evaluate Activities of Daily Living (ADLs) to create a personalized Plan of Care. You can call our clinical team at (262) 554-8800 to set this up.";
         }
-        if (lower.includes('hmo') || lower.includes('title 19') || lower.includes('insurance')) {
+        if (lower.includes('hmo') || lower.includes('title 19')) {
             return "We work with both Straight Title 19 and most major Medicaid HMOs like iCare. Our intake team acts as your administrative advocate to navigate these specific insurance requirements.";
         }
         return "Thank you for reaching out. As clinical needs are unique, I recommend speaking with one of our Heritage Health care coordinators at (262) 554-8800 for specific guidance tailored to your loved one’s condition.";
@@ -188,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.appendChild(typing);
 
             if (isLocal) {
-                const aiResp = await callGemini(msg);
+                const aiResp = await callGeminiLocal(msg);
                 if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
                 if (aiResp) appendMessage('bot', aiResp);
                 else appendMessage('bot', getClinicalResponse(msg));
