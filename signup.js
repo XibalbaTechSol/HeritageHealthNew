@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentStepEl = document.getElementById(`step${window.currentIntakeStep}`);
             const inputs = currentStepEl.querySelectorAll('[required]');
             let valid = true;
+            /* Dev Mode: Bypass validation to allow fast testing with empty fields
             inputs.forEach(input => {
                 if (!input.value) {
                     input.style.borderColor = '#ef4444';
@@ -145,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     input.style.borderColor = '';
                 }
             });
+            */
 
             if (valid && window.currentIntakeStep < steps.length) {
                 window.currentIntakeStep++;
