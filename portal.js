@@ -1,6 +1,6 @@
 /**
  * PORTAL LOGIC — Heritage Connect
- * FULL PRODUCTION SUITE: Auth, Firestore Sync, Profile Editing, Messaging, & Google Calendar Sync.
+ * FULL PRODUCTION SUITE: Auth, Firestore Sync, Profile Editing, Messaging, Google Calendar, Notifications & Logs.
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -17,9 +17,11 @@ import {
     setDoc, 
     collection, 
     addDoc, 
+    updateDoc,
     query, 
     where, 
     orderBy, 
+    limit,
     onSnapshot, 
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -55,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // 1. Fetch & Sync Profile
         const userDocRef = doc(db, "clients", user.uid);
         onSnapshot(userDocRef, (snap) => {
             if (snap.exists()) {
@@ -63,7 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // 2. Initialize Real-Time Systems
         initMessaging(user.uid);
+        initNotifications(user.uid);
+        initActivityLogs(user.uid);
+        initVisitLog(user.uid);
     });
 
 
@@ -95,6 +102,108 @@ document.addEventListener('DOMContentLoaded', () => {
         setField('prof-status', data.status || "Active");
     }
 
+    // ─── NOTIFICATIONS SYSTEM ───
+    function initNotifications(uid) {
+        const notifDot = document.getElementById('notifDot');
+        const notifList = document.getElementById('notifList');
+        const q = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(10));
+
+        onSnapshot(q, (snap) => {
+            let unreadCount = 0;
+            if (snap.empty) {
+                notifList.innerHTML = '<div class="text-center" style="padding: 20px; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>';
+                notifDot.style.display = 'none';
+                return;
+            }
+
+            notifList.innerHTML = '';
+            snap.forEach(doc => {
+                const n = doc.data();
+                if (!n.read) unreadCount++;
+                const item = document.createElement('div');
+                item.className = `notif-item ${n.read ? '' : 'unread'}`;
+                item.innerHTML = `
+                    <div class="notif-icon"><i class="fa-solid ${n.icon || 'fa-bell'}"></i></div>
+                    <div class="notif-content">
+                        <h5>${n.title}</h5>
+                        <p>${n.body}</p>
+                        <time>${n.timestamp?.toDate().toLocaleString() || 'Just now'}</time>
+                    </div>
+                `;
+                notifList.appendChild(item);
+            });
+
+            notifDot.style.display = unreadCount > 0 ? 'block' : 'none';
+        });
+
+        // Dropdown toggle
+        const bell = document.getElementById('notifBell');
+        const dropdown = document.getElementById('notifDropdown');
+        bell?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => dropdown.classList.remove('active'));
+    }
+
+    // ─── ACTIVITY FEED ───
+    function initActivityLogs(uid) {
+        const feed = document.getElementById('realActivityFeed');
+        const q = query(collection(db, "activity"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(8));
+
+        onSnapshot(q, (snap) => {
+            if (snap.empty) {
+                feed.innerHTML = '<div class="text-center" style="padding: 20px; color: var(--text-muted);">No recent activity.</div>';
+                return;
+            }
+            feed.innerHTML = '';
+            snap.forEach(doc => {
+                const a = doc.data();
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <div class="activity-dot" style="background: ${a.color || '#C9A84C'};"></div>
+                    <div class="activity-content">
+                        <p><strong>${a.title}</strong></p>
+                        <span>${a.body}</span>
+                        <time>${a.timestamp?.toDate().toLocaleString() || 'Just now'}</time>
+                    </div>
+                `;
+                feed.appendChild(item);
+            });
+        });
+    }
+
+    // ─── VISIT LOG ───
+    function initVisitLog(uid) {
+        const table = document.getElementById('visitTableBody');
+        const q = query(collection(db, "visits"), where("clientId", "==", uid), orderBy("date", "desc"));
+
+        onSnapshot(q, (snap) => {
+            if (snap.empty) {
+                table.innerHTML = '<tr><td colspan="7" class="text-center">No visit records found.</td></tr>';
+                return;
+            }
+            table.innerHTML = '';
+            snap.forEach(doc => {
+                const v = doc.data();
+                const tr = document.createElement('tr');
+                const statusClass = v.status === 'Verified' ? 'verified' : 'missed';
+                tr.innerHTML = `
+                    <td>${v.date}</td>
+                    <td>${v.caregiver}</td>
+                    <td>${v.service}</td>
+                    <td>${v.checkIn}</td>
+                    <td>${v.checkOut}</td>
+                    <td>${v.hours}</td>
+                    <td><span class="status-badge ${statusClass}">${v.status}</span></td>
+                `;
+                table.appendChild(tr);
+            });
+        });
+    }
+
     // ─── PROFILE EDITING ───
     const editModal = document.getElementById('editProfileModal');
     const editForm = document.getElementById('editProfileForm');
@@ -117,6 +226,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const updates = Object.fromEntries(formData.entries());
         try {
             await setDoc(doc(db, "clients", auth.currentUser.uid), updates, { merge: true });
+            // Add activity log for the edit
+            await addDoc(collection(db, "activity"), {
+                userId: auth.currentUser.uid,
+                title: "Profile Updated",
+                body: "You updated your personal information.",
+                timestamp: serverTimestamp(),
+                color: "#3B82F6"
+            });
             editModal.classList.remove('active');
             alert("Profile updated.");
         } catch (err) { alert(err.message); }
@@ -168,12 +285,20 @@ document.addEventListener('DOMContentLoaded', () => {
             clientName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
             senderName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
             senderRole: "Client",
-            senderInitials: (cachedUserData.firstName[0] + cachedUserData.lastName[0]).toUpperCase(),
+            senderInitials: (cachedUserData.firstName[0] + (cachedUserData.lastName ? cachedUserData.lastName[0] : '')).toUpperCase(),
             timestamp: serverTimestamp(),
             read: true
         };
         try {
             await addDoc(collection(db, "messages"), newMsg);
+            // Add activity log
+            await addDoc(collection(db, "activity"), {
+                userId: auth.currentUser.uid,
+                title: "Message Sent",
+                body: `Secure message sent to ${newMsg.recipient}.`,
+                timestamp: serverTimestamp(),
+                color: "#10B981"
+            });
             msgModal.classList.remove('active');
             msgForm.reset();
             alert("Message sent.");
@@ -187,28 +312,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await signInWithPopup(auth, googleProvider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential.accessToken;
-            
             syncBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
-            
-            // Fetch events from Google Calendar API
             const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?access_token=${token}`);
             const data = await response.json();
-            
             if (data.items) {
                 googleEvents = data.items.map(item => ({
                     title: item.summary,
                     start: item.start.dateTime || item.start.date,
                     type: 'google'
                 }));
-                renderCalendar(3, 2026); // Re-render for April 2026
-                alert(`Successfully synced ${googleEvents.length} events from Google Calendar.`);
+                renderCalendar(3, 2026);
+                alert(`Successfully synced ${googleEvents.length} events.`);
             }
-        } catch (err) {
-            console.error("Calendar Sync Error:", err);
-            alert("Failed to sync Google Calendar. Please ensure you grant permission.");
-        } finally {
-            syncBtn.innerHTML = '<i class="fa-brands fa-google"></i> Sync Google Calendar';
-        }
+        } catch (err) { alert("Failed to sync calendar."); }
+        finally { syncBtn.innerHTML = '<i class="fa-brands fa-google"></i> Sync Google Calendar'; }
     });
 
     // ─── CALENDAR RENDERER ───
@@ -218,29 +335,23 @@ document.addEventListener('DOMContentLoaded', () => {
         calGrid.innerHTML = '';
         const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
         document.getElementById('calMonthYear').textContent = `${monthNames[month]} ${year}`;
-        
         ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(day => {
             const h = document.createElement('div');
             h.className = 'cal-day-header';
             h.textContent = day;
             calGrid.appendChild(h);
         });
-
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-
         for (let i = 0; i < firstDay; i++) {
             const cell = document.createElement('div');
             cell.className = 'cal-day other-month';
             calGrid.appendChild(cell);
         }
-
         for (let d = 1; d <= daysInMonth; d++) {
             const cell = document.createElement('div');
             cell.className = 'cal-day';
             cell.innerHTML = `<div class="day-num">${d}</div>`;
-            
-            // Render Google Events if any
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             googleEvents.forEach(evt => {
                 if (evt.start.startsWith(dateStr)) {
@@ -258,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     cell.appendChild(evtTag);
                 }
             });
-
             calGrid.appendChild(cell);
         }
     }
@@ -285,6 +395,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.download = file.name;
                     link.click();
                     URL.revokeObjectURL(url);
+                    // Add activity log
+                    await addDoc(collection(db, "activity"), {
+                        userId: auth.currentUser.uid,
+                        title: "Document Downloaded",
+                        body: `You downloaded: ${file.name}`,
+                        timestamp: serverTimestamp(),
+                        color: "#8B5CF6"
+                    });
                 }
             }
         } catch (err) { alert("Error generating PDF."); }

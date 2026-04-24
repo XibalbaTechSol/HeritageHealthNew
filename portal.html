@@ -94,9 +94,18 @@
                 <i class="fa-solid fa-house"></i>
                 <span>Back to Website</span>
             </a>
-            <div class="notification-bell">
+            <div class="notification-bell" id="notifBell">
                 <i class="fa-solid fa-bell"></i>
-                <span class="notif-dot"></span>
+                <span class="notif-dot" id="notifDot" style="display:none;"></span>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>Notifications</span>
+                        <button id="markAllRead">Mark all as read</button>
+                    </div>
+                    <div class="notif-list" id="notifList">
+                        <div class="text-center" style="padding: 20px; color: var(--text-muted); font-size: 0.85rem;">No new notifications</div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -191,47 +200,9 @@
                         <h3>Recent Activity</h3>
                     </div>
                     <div class="card-body">
-                        <div class="activity-feed">
-                            <div class="activity-item">
-                                <div class="activity-dot" style="background: #10B981;"></div>
-                                <div class="activity-content">
-                                    <p><strong>Morning visit completed</strong></p>
-                                    <span>Sarah M. checked out at 10:02 AM</span>
-                                    <time>Today, 10:02 AM</time>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot" style="background: #3B82F6;"></div>
-                                <div class="activity-content">
-                                    <p><strong>Care note added</strong></p>
-                                    <span>Blood pressure reading: 128/82. Within normal range.</span>
-                                    <time>Today, 9:15 AM</time>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot" style="background: #C9A84C;"></div>
-                                <div class="activity-content">
-                                    <p><strong>Care plan updated</strong></p>
-                                    <span>RN Rachel updated medication schedule notes.</span>
-                                    <time>Yesterday, 3:30 PM</time>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot" style="background: #10B981;"></div>
-                                <div class="activity-content">
-                                    <p><strong>Evening visit completed</strong></p>
-                                    <span>Sarah M. checked out at 8:05 PM</span>
-                                    <time>Yesterday, 8:05 PM</time>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot" style="background: #8B5CF6;"></div>
-                                <div class="activity-content">
-                                    <p><strong>Document uploaded</strong></p>
-                                    <span>Monthly assessment report — April 2026</span>
-                                    <time>Apr 14, 2:00 PM</time>
-                                </div>
-                            </div>
+                        <div class="activity-feed" id="realActivityFeed">
+                            <!-- Populated by JS -->
+                            <div class="text-center" style="padding: 20px; color: var(--text-muted);">Loading activity...</div>
                         </div>
                     </div>
                 </div>
