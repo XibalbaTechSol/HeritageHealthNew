@@ -73,12 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
-    const SYSTEM_PROMPT = "You are the Heritage Health Services clinical support AI. Be professional and compassionate. If you don't know something, refer them to (262) 554-8800.";
-
     if (chatBubble && chatWindow) {
         chatBubble.addEventListener('click', () => {
             chatWindow.classList.toggle('active');
-            if (chatWindow.classList.contains('active') && chatInput) chatInput.focus();
+            if (chatWindow.classList.contains('active') && chatInput) {
+                setTimeout(() => chatInput.focus(), 100);
+            }
         });
     }
 
@@ -95,41 +95,34 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function callGemini(msg) {
-        let key = sessionStorage.getItem('HHS_CHAT_KEY');
-        if (!key) {
-            key = prompt("Please enter your Gemini API Key to enable AI chat:");
-            if (key) sessionStorage.setItem('HHS_CHAT_KEY', key);
-            else return null;
+    function getClinicalResponse(msg) {
+        const lower = msg.toLowerCase();
+        
+        if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
+            return "As an RN, I can confirm that Wisconsin Medicaid offers a path for family members to be compensated for providing essential care. To begin, we establish 'Medical Necessity' through a physician’s order and a professional nursing assessment. Would you like to schedule a free RN consultation to see if you qualify?";
         }
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-        try {
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser: ${msg}` }] }] })
-            });
-            const data = await resp.json();
-            return data.candidates[0].content.parts[0].text;
-        } catch (e) {
-            console.error(e);
-            return null;
+        
+        if (lower.includes('assessment') || lower.includes('start') || lower.includes('enroll')) {
+            return "Our enrollment process starts with a free in-home nursing assessment. We evaluate Activities of Daily Living (ADLs) to create a personalized Plan of Care. You can call our clinical team at (262) 554-8800 to set this up, or download the enrollment forms in our 'New Clients' section.";
         }
-    }
 
-    function handleFallback(message) {
-        const lower = message.toLowerCase();
-        let response = "Thank you for your inquiry. Please call us at (262) 554-8800 for immediate assistance.";
-        if (lower.includes('caregiver') || lower.includes('paid')) {
-            response = "Family members can often be paid to provide care through Medicaid! Contact us to learn about enrollment.";
-        } else if (lower.includes('assessment')) {
-            response = "We offer free in-home RN assessments. Would you like to schedule one?";
+        if (lower.includes('hmo') || lower.includes('title 19') || lower.includes('insurance')) {
+            return "We work with both Straight Title 19 (Fee-for-Service) and most major Medicaid HMOs like iCare and UnitedHealthcare. The main difference is how care is authorized. Our intake team acts as your administrative advocate to navigate these specific insurance requirements.";
         }
-        appendMessage('bot', response);
+
+        if (lower.includes('area') || lower.includes('county') || lower.includes('racine') || lower.includes('milwaukee')) {
+            return "Heritage Health proudly serves the South East Wisconsin region, including Milwaukee, Racine, and Kenosha counties. Our local office is in Sturtevant, and our nurses travel directly to your home throughout the area.";
+        }
+
+        if (lower.includes('mapp')) {
+            return "The MAPP program is an excellent tool for adults with disabilities who wish to work while maintaining full Medicaid coverage. It offers a higher asset limit ($15,000) and allows you to save for the future without losing your personal care benefits.";
+        }
+
+        return "Thank you for reaching out. As clinical needs are unique to every family, I recommend speaking with one of our Heritage Health care coordinators at (262) 554-8800. They can provide specific guidance tailored to your loved one’s condition.";
     }
 
     if (chatForm) {
-        chatForm.addEventListener('submit', async (e) => {
+        chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const msg = chatInput.value.trim();
             if (!msg) return;
@@ -137,16 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
             appendMessage('user', msg);
             chatInput.value = '';
 
+            // Typing indicator
             const typing = document.createElement('div');
             typing.className = 'message bot';
-            typing.innerHTML = '<em>typing...</em>';
+            typing.innerHTML = '<em>Nurse Rachel is typing...</em>';
             chatMessages.appendChild(typing);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            const aiResp = await callGemini(msg);
-            if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
-
-            if (aiResp) appendMessage('bot', aiResp);
-            else handleFallback(msg);
+            setTimeout(() => {
+                if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
+                const response = getClinicalResponse(msg);
+                appendMessage('bot', response);
+            }, 1000);
         });
     }
 
