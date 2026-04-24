@@ -1796,7 +1796,8 @@ h4, h5, h6 {
     transition: all 0.9s var(--ease-out);
 }
 
-.reveal.visible {
+.reveal.visible,
+.reveal.active {
     opacity: 1;
     transform: translateY(0);
 }
