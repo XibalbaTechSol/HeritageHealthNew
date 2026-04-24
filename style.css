@@ -488,8 +488,8 @@ h4, h5, h6 {
     color: var(--white);
     line-height: 1.08;
     margin-bottom: 28px;
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1;
+    transform: none;
     animation: fadeUp 0.9s var(--ease-out) 0.5s forwards;
 }
 
