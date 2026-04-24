@@ -70,27 +70,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUIWithUserData(data) {
+        console.log("Intake: Populating Profile with real data", data);
+        
+        // --- Dashboard & Global ---
         document.querySelectorAll('.page-title').forEach(el => {
-            if (el.closest('#page-dashboard')) el.textContent = `Good Day, ${data.firstName}`;
+            if (el.closest('#page-dashboard')) el.textContent = `Good Day, ${data.firstName || 'Client'}`;
         });
-        document.querySelectorAll('.user-name').forEach(el => el.textContent = `${data.firstName} ${data.lastName ? data.lastName.charAt(0) : ''}.`);
-        const initials = (data.firstName.charAt(0) + (data.lastName ? data.lastName.charAt(0) : '')).toUpperCase();
+        
+        const firstName = data.firstName || 'User';
+        const lastName = data.lastName || '';
+        document.querySelectorAll('.user-name').forEach(el => el.textContent = `${firstName} ${lastName ? lastName.charAt(0) : ''}.`);
+        
+        const initials = (firstName.charAt(0) + (lastName ? lastName.charAt(0) : '')).toUpperCase();
         document.querySelectorAll('.user-avatar').forEach(av => av.textContent = initials);
 
+        // --- Profile Page Fields ---
         const setField = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.textContent = val || "—";
         };
-        setField('prof-fullName', `${data.firstName} ${data.lastName || ''}`);
+
+        setField('prof-fullName', `${data.title || ''} ${data.firstName || ''} ${data.lastName || ''}`.trim());
         setField('prof-uid', data.uid);
         setField('prof-dob', data.dob);
-        setField('prof-phone', data.pcwPhone);
-        setField('prof-address', `${data.address || ''}, ${data.city || ''}, WI ${data.zip || ''}`);
+        setField('prof-phone', data.pcwPhone); // Note: Registration uses pcwPhone as primary contact
+        setField('prof-address', `${data.address || ''}, ${data.city || ''}, ${data.state || 'WI'} ${data.zip || ''}`);
+        
         setField('prof-medicaid', data.medicaidNumber);
         setField('prof-language', data.language);
         setField('prof-gender', data.gender);
+        
         setField('prof-doctor', data.doctorName);
         setField('prof-docLoc', data.doctorLocation);
+        
         setField('prof-pcw', data.pcwName);
         setField('prof-status', data.status || "Active");
     }
