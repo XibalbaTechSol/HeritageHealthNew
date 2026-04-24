@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Heritage Connect | Heritage Health Services</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="signup.css">
+</head>
+<body>
+
+    <!-- ═══════════ HEADER ═══════════ -->
+    <header class="site-header scrolled">
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <img src="logo-header-dark.png" alt="Heritage Health Services" class="logo-img-header">
+                <div class="logo-text" style="color: var(--navy);">
+                    <span>HERITAGE</span>
+                    <span style="font-weight: 400; color: var(--gold);">HEALTH</span>
+                </div>
+            </a>
+            <a href="index.html" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Website</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="signup-main">
+        <div class="container">
+            <div class="signup-wizard-container">
+                
+                <!-- Wizard Sidebar / Progress -->
+                <aside class="wizard-sidebar">
+                    <div class="wizard-progress-header">
+                        <h2>Client Enrollment</h2>
+                        <p>Complete your Heritage Connect registration.</p>
+                    </div>
+                    <ul class="wizard-steps">
+                        <li class="wizard-step active" data-step="1">
+                            <span class="step-num">1</span>
+                            <span class="step-label">Account Setup</span>
+                        </li>
+                        <li class="wizard-step" data-step="2">
+                            <span class="step-num">2</span>
+                            <span class="step-label">Demographics</span>
+                        </li>
+                        <li class="wizard-step" data-step="3">
+                            <span class="step-num">3</span>
+                            <span class="step-label">Medical Profile</span>
+                        </li>
+                        <li class="wizard-step" data-step="4">
+                            <span class="step-num">4</span>
+                            <span class="step-label">Referral Info</span>
+                        </li>
+                        <li class="wizard-step" data-step="5">
+                            <span class="step-num">5</span>
+                            <span class="step-label">Authorization</span>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Wizard Form Area -->
+                <div class="wizard-form-area">
+                    <form id="intakeForm">
+                        
+                        <!-- STEP 1: ACCOUNT -->
+                        <div class="form-step active" id="step1">
+                            <h3>Create Your Account</h3>
+                            <p class="step-desc">Register with your email to access your secure patient portal.</p>
+                            
+                            <div class="social-auth-grid">
+                                <button type="button" class="btn-social google">
+                                    <i class="fa-brands fa-google"></i>
+                                    <span>Register with Google</span>
+                                </button>
+                            </div>
+                            
+                            <div class="auth-divider"><span>or use email</span></div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-input" required placeholder="name@example.com">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-input" required placeholder="••••••••">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" name="confirmPassword" class="form-input" required placeholder="••••••••">
+                                </div>
+                            </div>
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn-primary next-step">Next Step</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: DEMOGRAPHICS -->
+                        <div class="form-step" id="step2">
+                            <h3>Client Information</h3>
+                            <p class="step-desc">Enter the details for the individual receiving care.</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 0.5;">
+                                    <label class="form-label">Title</label>
+                                    <select name="title" class="form-select">
+                                        <option>Mr.</option>
+                                        <option>Mrs.</option>
+                                        <option>Ms.</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" name="firstName" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" name="lastName" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Social Security Number</label>
+                                    <input type="text" name="ssn" class="form-input" placeholder="XXX-XX-XXXX" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" name="dob" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Primary Language</label>
+                                    <input type="text" name="language" class="form-input" placeholder="English, Spanish, etc.">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Gender</label>
+                                    <select name="gender" class="form-select">
+                                        <option>Female</option>
+                                        <option>Male</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Street Address</label>
+                                <input type="text" name="address" class="form-input" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">City</label>
+                                    <input type="text" name="city" class="form-input" required>
+                                </div>
+                                <div class="form-group" style="flex: 0.5;">
+                                    <label class="form-label">State</label>
+                                    <input type="text" name="state" class="form-input" value="WI" readonly>
+                                </div>
+                                <div class="form-group" style="flex: 0.5;">
+                                    <label class="form-label">Zip</label>
+                                    <input type="text" name="zip" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn-outline-dark prev-step">Back</button>
+                                <button type="button" class="btn btn-primary next-step">Next Step</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: MEDICAL -->
+                        <div class="form-step" id="step3">
+                            <h3>Medical Profile</h3>
+                            <p class="step-desc">Your clinical records are protected under HIPAA.</p>
+
+                            <div class="form-group">
+                                <label class="form-label">Forward Health / Medicaid Card Number</label>
+                                <input type="text" name="medicaidNumber" class="form-input" required>
+                            </div>
+
+                            <h4 class="form-subtitle-inline">Primary Physician</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Doctor's Name</label>
+                                    <input type="text" name="doctorName" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Clinic Location</label>
+                                    <input type="text" name="doctorLocation" class="form-input" placeholder="City or Facility Name">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Doctor Phone</label>
+                                    <input type="tel" name="doctorPhone" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Doctor Fax</label>
+                                    <input type="tel" name="doctorFax" class="form-input">
+                                </div>
+                            </div>
+
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn-outline-dark prev-step">Back</button>
+                                <button type="button" class="btn btn-primary next-step">Next Step</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: REFERRAL -->
+                        <div class="form-step" id="step4">
+                            <h3>Agency & Referral Info</h3>
+                            <p class="step-desc">Help us understand your history and caregiver preferences.</p>
+
+                            <div class="form-group">
+                                <label class="form-label">Have you ever been with another Personal Care Agency?</label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="prevAgency" value="yes"> Yes</label>
+                                    <label><input type="radio" name="prevAgency" value="no" checked> No</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="whichAgencyGroup" style="display: none;">
+                                <label class="form-label">Which Agency?</label>
+                                <input type="text" name="agencyName" class="form-input">
+                            </div>
+
+                            <h4 class="form-subtitle-inline">Chosen Personal Care Worker (Optional)</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">If you have a family member or friend you would like to have paid for your care, enter their info here.</p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">PCW Name</label>
+                                    <input type="text" name="pcwName" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">PCW Phone</label>
+                                    <input type="tel" name="pcwPhone" class="form-input">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label class="form-label">How did you hear about Heritage Health?</label>
+                                <input type="text" name="referralSource" class="form-input">
+                            </div>
+
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn-outline-dark prev-step">Back</button>
+                                <button type="button" class="btn btn-primary next-step">Next Step</button>
+                            </div>
+                        </div>
+
+                        <!-- STEP 5: SIGNATURE & SUBMIT -->
+                        <div class="form-step" id="step5">
+                            <h3>Digital Authorization</h3>
+                            <p class="step-desc">By signing below, you authorize Heritage Health Services to obtain necessary medical records and process your enrollment. This signature will be applied to your official Release forms.</p>
+
+                            <div class="signature-container">
+                                <div class="signature-header">
+                                    <span>Signature of Client or Legal Guardian</span>
+                                    <button type="button" id="clearSignature">Clear</button>
+                                </div>
+                                <canvas id="signaturePad" width="600" height="200"></canvas>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" required>
+                                    <span>I certify that all information provided is accurate and I agree to the <a href="legal.html" target="_blank">Terms of Use</a>.</span>
+                                </label>
+                            </div>
+
+                            <div class="wizard-actions">
+                                <button type="button" class="btn btn-outline-dark prev-step">Back</button>
+                                <button type="submit" class="btn btn-primary" id="submitIntake">Complete Enrollment</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="main.js"></script>
+    <script src="signup.js"></script>
+</body>
+</html>

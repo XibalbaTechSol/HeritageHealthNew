@@ -1,0 +1,269 @@
+/* ═══════════════════════════════════════════════════
+   SIGNUP & INTAKE WIZARD STYLES
+   ═══════════════════════════════════════════════════ */
+
+.signup-main {
+    padding: 140px 0 100px;
+    background: #f4f5f7;
+    min-height: 100vh;
+}
+
+.signup-wizard-container {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    background: var(--white);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    min-height: 700px;
+}
+
+/* --- Sidebar --- */
+.wizard-sidebar {
+    background: var(--navy);
+    color: var(--white);
+    padding: 60px 40px;
+}
+
+.wizard-progress-header h2 {
+    color: var(--white);
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+}
+
+.wizard-progress-header p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 48px;
+}
+
+.wizard-steps {
+    list-style: none;
+    padding: 0;
+}
+
+.wizard-step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+}
+
+.wizard-step.active {
+    opacity: 1;
+}
+
+.wizard-step.completed {
+    opacity: 0.8;
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.wizard-step.active .step-num {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+}
+
+.wizard-step.completed .step-num {
+    background: var(--white);
+    color: var(--navy);
+}
+
+.step-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* --- Form Area --- */
+.wizard-form-area {
+    padding: 60px 80px;
+}
+
+.form-step {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.form-step h3 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    color: var(--navy);
+}
+
+.step-desc {
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    font-size: 1rem;
+}
+
+.form-subtitle-inline {
+    margin: 40px 0 20px;
+    font-size: 1.1rem;
+    color: var(--navy);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--stone);
+}
+
+/* --- Auth Elements --- */
+.social-auth-grid {
+    margin-bottom: 32px;
+}
+
+.btn-social {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--stone);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-social:hover {
+    background: #f8f9fa;
+    border-color: #cbd5e1;
+}
+
+.auth-divider {
+    text-align: center;
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--stone);
+    z-index: 1;
+}
+
+.auth-divider span {
+    background: var(--white);
+    padding: 0 15px;
+    position: relative;
+    z-index: 2;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* --- Signature --- */
+.signature-container {
+    border: 1px solid var(--stone);
+    border-radius: var(--r-sm);
+    background: #fafafa;
+    margin-top: 20px;
+}
+
+.signature-header {
+    padding: 10px 20px;
+    background: #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+#clearSignature {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#signaturePad {
+    width: 100%;
+    height: 200px;
+    cursor: crosshair;
+}
+
+/* --- Wizard Actions --- */
+.wizard-actions {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--stone);
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+}
+
+/* --- Inputs Overrides --- */
+.checkbox-label {
+    display: flex;
+    gap: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    margin-top: 3px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 30px;
+    margin-top: 10px;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+    .signup-wizard-container {
+        grid-template-columns: 1fr;
+    }
+    .wizard-sidebar {
+        padding: 40px;
+    }
+    .wizard-steps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .wizard-step {
+        margin-bottom: 0;
+    }
+    .wizard-form-area {
+        padding: 40px;
+    }
+}
