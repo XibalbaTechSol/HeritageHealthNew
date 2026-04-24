@@ -92,23 +92,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUIWithUserData(data) {
-        // Update Greeting
+        console.log("Intake: Updating UI with real data", data);
+        
+        // --- Dashboard & Global ---
         const greeting = document.querySelector('.page-title');
         if (greeting && data.firstName) {
             greeting.textContent = `Good Day, ${data.firstName}`;
         }
         
-        // Update Sidebar Info
         const sidebarName = document.querySelector('.user-name');
         if (sidebarName && data.firstName && data.lastName) {
             sidebarName.textContent = `${data.firstName} ${data.lastName.charAt(0)}.`;
         }
 
-        // Update Avatar
         if (data.firstName && data.lastName) {
             const initials = (data.firstName.charAt(0) + data.lastName.charAt(0)).toUpperCase();
             document.querySelectorAll('.user-avatar').forEach(av => av.textContent = initials);
         }
+
+        // --- Profile Page Fields ---
+        const setField = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val || "Not Provided";
+        };
+
+        setField('prof-fullName', `${data.title || ''} ${data.firstName} ${data.lastName}`.trim());
+        setField('prof-uid', data.uid);
+        setField('prof-dob', data.dob);
+        setField('prof-phone', data.pcwPhone); // Note: using PCW phone as fallback or client phone if available
+        setField('prof-address', `${data.address}, ${data.city}, WI ${data.zip}`);
+        setField('prof-medicaid', data.medicaidNumber);
+        setField('prof-language', data.language);
+        setField('prof-gender', data.gender);
+        setField('prof-doctor', data.doctorName);
+        setField('prof-docLoc', data.doctorLocation);
+        setField('prof-pcw', data.pcwName);
+        setField('prof-status', data.status || "Pending Review");
     }
 
     // ─── PAGE NAVIGATION ───
