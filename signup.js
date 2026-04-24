@@ -10,7 +10,6 @@ import {
     getAuth, 
     createUserWithEmailAndPassword, 
     GoogleAuthProvider, 
-    signInWithPopup,
     signInWithRedirect,
     getRedirectResult,
     onAuthStateChanged
@@ -22,11 +21,6 @@ import {
     getDoc,
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// Global libraries loaded via CDN in HTML
-const PDFLib = window.PDFLib;
-const SignaturePad = window.SignaturePad;
-const emailjs = window.emailjs;
 
 // ─── CONFIGURATION ───
 const firebaseConfig = {
@@ -59,12 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             step.classList.remove('active');
             if (parseInt(step.id.replace('step', '')) === window.currentIntakeStep) {
                 step.classList.add('active');
-                
-                // CRITICAL: Resize signature pad if we just entered the signature step
                 if (window.currentIntakeStep === 5 && typeof window.resizeSignatureCanvas === 'function') {
-                    setTimeout(() => {
-                        window.resizeSignatureCanvas();
-                    }, 200);
+                    setTimeout(() => window.resizeSignatureCanvas(), 200);
                 }
             }
         });
@@ -79,31 +69,26 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ─── AUTH STATE HANDLING ───
+    // ─── AUTH STATE ───
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            console.log("Auth State Changed: User detected", user.email);
-            
-            // Pre-fill email in the form
+            console.log("Intake: User authenticated", user.email);
             const emailInput = document.querySelector('input[name="email"]');
             if (emailInput) emailInput.value = user.email;
 
-            // Auto-create client profile if it doesn't exist
+            // Auto-create initial profile
             try {
                 const clientDoc = await getDoc(doc(db, "clients", user.uid));
                 if (!clientDoc.exists()) {
                     await setDoc(doc(db, "clients", user.uid), {
                         uid: user.uid,
                         email: user.email,
-                        status: "Registration In-Progress",
+                        status: "In-Progress",
                         createdAt: serverTimestamp()
                     }, { merge: true });
                 }
-            } catch (e) {
-                console.error("Firestore Error during auto-profile:", e);
-            }
+            } catch (e) { console.error("Profile init error:", e); }
 
-            // Move to Step 2 if user is authenticated and we are still on Step 1
             if (window.currentIntakeStep === 1) {
                 window.currentIntakeStep = 2;
                 window.updateWizardUI();
@@ -114,48 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── GOOGLE SIGN IN ───
     const googleBtn = document.querySelector('.btn-social.google');
     if (googleBtn) {
-        googleBtn.addEventListener('click', async () => {
-            // Try Popup first (best UX), fallback to Redirect if needed
-            try {
-                const result = await signInWithPopup(auth, provider);
-                console.log("Popup Auth Success");
-            } catch (error) {
-                if (error.code === 'auth/popup-blocked') {
-                    console.log("Popup blocked, falling back to Redirect...");
-                    signInWithRedirect(auth, provider);
-                } else {
-                    console.error("Google Auth Error:", error.code, error.message);
-                    alert(`Sign-In Error: ${error.message}`);
-                }
-            }
-        });
+        googleBtn.addEventListener('click', () => signInWithRedirect(auth, provider));
     }
-
-    // Handle Redirect Result (for fallback or mobile)
-    getRedirectResult(auth).catch((error) => {
-        if (error.code !== 'auth/callback-internal-error') {
-            console.error("Redirect Result Error:", error.code, error.message);
-        }
-    });
+    getRedirectResult(auth).catch(e => console.error("Redirect Error:", e));
 
     // ─── NAVIGATION ───
     nextBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const currentStepEl = document.getElementById(`step${window.currentIntakeStep}`);
-            const inputs = currentStepEl.querySelectorAll('[required]');
-            let valid = true;
-            /* Dev Mode: Bypass validation to allow fast testing with empty fields
-            inputs.forEach(input => {
-                if (!input.value) {
-                    input.style.borderColor = '#ef4444';
-                    valid = false;
-                } else {
-                    input.style.borderColor = '';
-                }
-            });
-            */
-
-            if (valid && window.currentIntakeStep < steps.length) {
+            if (window.currentIntakeStep < steps.length) {
                 window.currentIntakeStep++;
                 window.updateWizardUI();
             }
@@ -171,12 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-
     // ─── SIGNATURE PAD ───
     const canvas = document.getElementById('signaturePad');
     let signaturePad = null;
     if (canvas) {
-        signaturePad = new SignaturePad(canvas, {
+        signaturePad = new window.SignaturePad(canvas, {
             backgroundColor: 'rgba(255, 255, 255, 0)',
             penColor: 'rgb(10, 31, 58)'
         });
@@ -189,54 +139,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.addEventListener("resize", window.resizeSignatureCanvas);
         window.resizeSignatureCanvas();
-        document.getElementById('clearSignature').addEventListener('click', () => {
-            signaturePad.clear();
-        });
+        document.getElementById('clearSignature').addEventListener('click', () => signaturePad.clear());
     }
 
-
-    // ─── CONDITIONAL FIELDS ───
-    const prevAgencyRadios = document.querySelectorAll('input[name="prevAgency"]');
-    const whichAgencyGroup = document.getElementById('whichAgencyGroup');
-    if (prevAgencyRadios && whichAgencyGroup) {
-        prevAgencyRadios.forEach(r => {
-            r.addEventListener('change', () => {
-                whichAgencyGroup.style.display = (r.value === 'yes') ? 'block' : 'none';
-            });
-        });
-    }
-
-
-    // ─── PDF PROCESSING ───
+    // ─── PDF GENERATION ───
     async function generateSignedPDFs(data) {
-        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        const { PDFDocument, rgb, StandardFonts } = window.PDFLib;
         const attachments = [];
 
         async function processPDF(fileName, drawLogic) {
-            const url = `./${fileName}`;
-            const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
-            const pdfDoc = await PDFDocument.load(existingPdfBytes);
+            const bytes = await fetch(`./${fileName}`).then(res => res.arrayBuffer());
+            const pdfDoc = await PDFDocument.load(bytes);
             const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
             const pages = pdfDoc.getPages();
             const firstPage = pages[0];
             let sigImage = null;
-            if (data.signature) {
-                sigImage = await pdfDoc.embedPng(data.signature);
-            }
+            if (data.signature) sigImage = await pdfDoc.embedPng(data.signature);
             drawLogic(firstPage, font, sigImage, rgb);
-            const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
-            attachments.push({
-                name: fileName.replace('.pdf', '_Signed.pdf'),
-                data: pdfBase64
-            });
+            const base64 = await pdfDoc.saveAsBase64({ dataUri: false });
+            attachments.push({ name: fileName.replace('.pdf', '_Signed.pdf'), data: base64 });
         }
 
-        // Mapping Logic
         await processPDF('New-Client-Referral2017.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
-            const draw = (text, x, y, size = 10) => {
-                if (text) page.drawText(String(text), { x, y: height - y, size, font });
-            };
+            const draw = (t, x, y) => t && page.drawText(String(t), { x, y: height - y, size: 10, font });
             draw(new Date().toLocaleDateString(), 550, 195);
             draw(`${data.lastName}, ${data.firstName}`, 100, 255);
             draw(data.ssn, 70, 272);
@@ -255,9 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await processPDF('Medical-Release2017.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
-            const draw = (text, x, y, size = 11) => {
-                if (text) page.drawText(String(text), { x, y: height - y, size, font });
-            };
+            const draw = (t, x, y) => t && page.drawText(String(t), { x, y: height - y, size: 11, font });
             draw(data.doctorName, 300, 420);
             draw(new Date().toLocaleDateString(), 420, 695);
             draw(`${data.firstName} ${data.lastName}`, 300, 755);
@@ -268,12 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await processPDF('Medical-Rec-Release-Wheaton.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
-            const draw = (text, x, y, size = 10) => {
-                if (text) page.drawText(String(text), { x, y: height - y, size, font });
-            };
+            const draw = (t, x, y) => t && page.drawText(String(t), { x, y: height - y, size: 10, font });
             draw(data.lastName, 100, 82);
             draw(data.firstName, 550, 82);
-            draw(data.address + ", " + data.city + ", WI " + data.zip, 100, 115);
+            draw(data.address + ", " + data.city, 100, 115);
             draw(data.dob, 100, 142);
             draw(data.gender, 250, 142);
             draw(data.pcwPhone, 550, 142);
@@ -284,21 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return attachments;
     }
 
-
-    // ─── FINAL DATA SUBMISSION ───
+    // ─── SUBMISSION ───
     const intakeForm = document.getElementById('intakeForm');
     if (intakeForm) {
         intakeForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            if (signaturePad && signaturePad.isEmpty()) {
-                alert("Please provide a signature to authorize the enrollment.");
-                return;
-            }
+            if (signaturePad && signaturePad.isEmpty()) return alert("Please provide a signature.");
 
             const submitBtn = document.getElementById('submitIntake');
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.textContent = "Processing & Securing Enrollment...";
+            submitBtn.textContent = "Processing...";
             submitBtn.disabled = true;
 
             try {
@@ -307,57 +223,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.signature = signaturePad.toDataURL();
 
                 let uid;
-                if (auth.currentUser) {
-                    uid = auth.currentUser.uid;
-                } else if (data.email && data.password) {
-                    const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-                    uid = userCredential.user.uid;
-                } else {
-                    throw new Error("Please complete the Account Setup (Step 1) before submitting.");
-                }
+                if (auth.currentUser) uid = auth.currentUser.uid;
+                else if (data.email && data.password) {
+                    const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+                    uid = cred.user.uid;
+                } else throw new Error("Auth missing.");
 
                 const signedFiles = await generateSignedPDFs(data);
 
-                const cleanData = { ...data };
+                const cleanData = { ...data, uid, updatedAt: serverTimestamp(), status: "Pending Review" };
                 delete cleanData.password;
                 delete cleanData.confirmPassword;
-                cleanData.uid = uid;
-                cleanData.updatedAt = serverTimestamp();
-                cleanData.status = "Pending Review";
                 
                 await setDoc(doc(db, "clients", uid), cleanData, { merge: true });
 
-                // 4. Send Signed Packet via EmailJS (Non-blocking fail-safe)
+                // EmailJS (Fail-safe)
                 try {
-                    const PK = "YOUR_PUBLIC_KEY"; // Replace with your real public key
+                    const PK = "YOUR_PUBLIC_KEY";
                     if (PK !== "YOUR_PUBLIC_KEY") {
-                        emailjs.init(PK);
-                        await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                        window.emailjs.init(PK);
+                        await window.emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
                             client_name: `${data.firstName} ${data.lastName}`,
-                            client_email: data.email || auth.currentUser.email,
-                            client_phone: data.pcwPhone,
                             referral_doc: signedFiles[0].data,
                             release_doc_1: signedFiles[1].data,
                             release_doc_2: signedFiles[2].data
                         });
-                        console.log("EmailJS: Packet sent successfully.");
-                    } else {
-                        console.warn("EmailJS: Skipping email delivery (using placeholder keys).");
                     }
-                } catch (emailErr) {
-                    console.error("EmailJS Error (Continuing anyway):", emailErr);
-                }
+                } catch (ee) { console.error("Email error:", ee); }
 
-                alert("Success! Your account has been created and your signed authorization forms have been generated. Redirecting to Heritage Connect...");
+                alert("Success! Your enrollment is complete.");
                 window.location.href = '/portal';
 
             } catch (err) {
-                console.error("Enrollment Error:", err);
-                alert("An error occurred: " + err.message);
-                submitBtn.textContent = originalBtnText;
+                console.error("Submission Error:", err);
+                alert("Error: " + err.message);
+                submitBtn.textContent = "Complete Enrollment";
                 submitBtn.disabled = false;
             }
         });
     }
-
 });
