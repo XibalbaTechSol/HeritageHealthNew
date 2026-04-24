@@ -2,12 +2,22 @@
  * SIGNUP & INTAKE LOGIC — Heritage Connect
  * Handles multi-step form navigation, signature capture, 
  * automated PDF generation, Firebase Auth/Firestore, and EmailJS delivery.
- * Using Firebase Modular SDK (v9+).
+ * Using Firebase Modular SDK (v10.12.0).
  */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    GoogleAuthProvider, 
+    signInWithPopup 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Global libraries loaded via CDN in HTML
 const PDFLib = window.PDFLib;
@@ -25,42 +35,40 @@ const firebaseConfig = {
   measurementId: "G-Q8NZ603J99"
 };
 
-// TODO: Replace with your credentials from EmailJS Dashboard
-const emailjsConfig = {
-    publicKey: "YOUR_PUBLIC_KEY",
-    serviceId: "YOUR_SERVICE_ID",
-    templateId: "YOUR_TEMPLATE_ID"
-};
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // ─── GOOGLE SIGN IN ───
     const googleBtn = document.querySelector('.btn-social.google');
     if (googleBtn) {
-        googleBtn.addEventListener('click', async () => {
-            try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                console.log("Google User:", user.email);
-                
-                // Pre-fill email if possible
-                const emailInput = document.querySelector('input[name="email"]');
-                if (emailInput) emailInput.value = user.email;
+        googleBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    console.log("Google User Authenticated:", user.email);
+                    
+                    // Pre-fill email and advance
+                    const emailInput = document.querySelector('input[name="email"]');
+                    if (emailInput) emailInput.value = user.email;
 
-                // Advance to Demographics Step automatically
-                currentStep = 2;
-                updateWizard();
-                
-            } catch (error) {
-                console.error("Google Auth Error:", error);
-                alert("Google Sign-In failed: " + error.message);
-            }
+                    // Automatically move to the next step
+                    const step1 = document.getElementById('step1');
+                    const step2 = document.getElementById('step2');
+                    if (step1 && step2) {
+                        // We trigger a "simulated" next click or just update wizard
+                        // Direct state update is cleaner
+                        const nextBtn = step1.querySelector('.next-step');
+                        if (nextBtn) nextBtn.click();
+                    }
+                }).catch((error) => {
+                    console.error("Google Auth Error:", error.code, error.message);
+                    alert(`Sign-In Error (${error.code}): ${error.message}`);
+                });
         });
     }
     
@@ -92,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const currentStepEl = document.getElementById(`step${currentStep}`);
+            // Special case: Step 1 might be skipped by Google Login
             const inputs = currentStepEl.querySelectorAll('[required]');
             let valid = true;
             inputs.forEach(input => {
@@ -179,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             drawLogic(firstPage, font, sigImage, rgb);
             
-            // Output as base64 string for EmailJS
             const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
             attachments.push({
                 name: fileName.replace('.pdf', '_Signed.pdf'),
@@ -187,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 1. Referral Form Mapping
         await processPDF('New-Client-Referral2017.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
             const draw = (text, x, y, size = 10) => {
@@ -209,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
             draw(data.pcwName, 200, 855);
         });
 
-        // 2. Medical Release Mapping
         await processPDF('Medical-Release2017.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
             const draw = (text, x, y, size = 11) => {
@@ -223,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sig) page.drawImage(sig, { x: 300, y: height - 820, width: 150, height: 40 });
         });
 
-        // 3. Wheaton Mapping
         await processPDF('Medical-Rec-Release-Wheaton.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
             const draw = (text, x, y, size = 10) => {
@@ -265,10 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
             data.signature = signaturePad.toDataURL();
 
             let uid;
-            
-            // 1. Handle User Creation/Retrieval
-            // If the user used Google, they are already signed in.
-            // If they filled out the password fields, we create them.
             if (auth.currentUser) {
                 uid = auth.currentUser.uid;
             } else if (data.email && data.password) {
@@ -278,10 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error("Please complete the Account Setup (Step 1) before submitting.");
             }
 
-            // 2. Generate Signed PDFs in Browser
             const signedFiles = await generateSignedPDFs(data);
 
-            // 3. Save Profile Data to Firestore
             const cleanData = { ...data };
             delete cleanData.password;
             delete cleanData.confirmPassword;
@@ -291,9 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             await setDoc(doc(db, "clients", uid), cleanData, { merge: true });
 
-            // 4. Send Signed Packet via EmailJS
-            emailjs.init(emailjsConfig.publicKey);
-            await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
+            emailjs.init("YOUR_PUBLIC_KEY");
+            await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
                 client_name: `${data.firstName} ${data.lastName}`,
                 client_email: data.email || auth.currentUser.email,
                 client_phone: data.pcwPhone,
@@ -302,8 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 release_doc_2: signedFiles[2].data
             });
 
-            alert("Success! Your account has been created, your clinical profile saved, and signed forms sent to our team. Redirecting to Heritage Connect...");
-            window.location.href = 'portal.html';
+            alert("Success! Your account has been created and signed forms sent. Redirecting...");
+            window.location.href = '/portal';
 
         } catch (err) {
             console.error("Enrollment Error:", err);
