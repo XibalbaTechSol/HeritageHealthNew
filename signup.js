@@ -62,7 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // CRITICAL: Resize signature pad if we just entered the signature step
                 if (window.currentIntakeStep === 5 && typeof window.resizeSignatureCanvas === 'function') {
-                    window.resizeSignatureCanvas();
+                    setTimeout(() => {
+                        window.resizeSignatureCanvas();
+                    }, 200);
                 }
             }
         });
