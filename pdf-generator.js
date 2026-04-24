@@ -9,8 +9,11 @@ export async function generateClientPacket(data) {
 
     // Helper to load and fill a PDF
     async function processPDF(fileName, drawLogic) {
-        const url = `./${fileName}`;
-        const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
+        const url = `/${fileName}`;
+        const existingPdfBytes = await fetch(url).then(res => {
+            if (!res.ok) throw new Error(`Could not load PDF: ${url}`);
+            return res.arrayBuffer();
+        });
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const pages = pdfDoc.getPages();

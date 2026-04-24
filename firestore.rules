@@ -1,8 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Clients can only read/write their own profile
     match /clients/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Messaging: Clients can only see messages where they are the clientId
+    match /messages/{msgId} {
+      allow read, write: if request.auth != null && request.resource.data.clientId == request.auth.uid;
+      allow read: if request.auth != null && resource.data.clientId == request.auth.uid;
+    }
+    
+    // Visits: Clients can read their own visit logs
+    match /visits/{visitId} {
+      allow read: if request.auth != null && resource.data.clientId == request.auth.uid;
+    }
+    
+    // Vitals: Clients can read/write their own vitals
+    match /vitals/{vitalId} {
+      allow read, write: if request.auth != null && (resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid);
+    }
+    
+    // Activity & Notifications
+    match /activity/{actId} {
+      allow read, write: if request.auth != null && (resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid);
+    }
+    match /notifications/{notId} {
+      allow read, write: if request.auth != null && (resource.data.userId == request.auth.uid || request.resource.data.userId == request.auth.uid);
+    }
+    
+    // Nurse Visits (Scheduler)
+    match /nurse_visits/{visitId} {
+      allow read, write: if request.auth != null && (resource.data.clientId == request.auth.uid || request.resource.data.clientId == request.auth.uid);
+    }
+
+    // Care Plans & Teams
+    match /care_plans/{planId} {
+      allow read: if request.auth != null && resource.data.clientId == request.auth.uid;
+    }
+    match /care_teams/{teamId} {
+      allow read: if request.auth != null && resource.data.clientId == request.auth.uid;
     }
   }
 }
