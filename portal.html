@@ -541,80 +541,15 @@
                     <h1 class="page-title">Profile</h1>
                     <p class="page-subtitle">Account and personal information</p>
                 </div>
+                <div class="page-actions">
+                    <button class="btn-portal" id="openEditProfile">
+                        <i class="fa-solid fa-user-pen"></i> Edit Profile
+                    </button>
+                </div>
             </div>
 
             <div class="profile-grid">
-                <div class="card">
-                    <div class="card-header"><h3>Personal Information</h3></div>
-                    <div class="card-body">
-                        <div class="profile-field">
-                            <label>Full Name</label>
-                            <span id="prof-fullName">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Member ID / UID</label>
-                            <span id="prof-uid">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Date of Birth</label>
-                            <span id="prof-dob">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Phone</label>
-                            <span id="prof-phone">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Address</label>
-                            <span id="prof-address">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header"><h3>Clinical Details</h3></div>
-                    <div class="card-body">
-                        <div class="profile-field">
-                            <label>Medicaid Number</label>
-                            <span id="prof-medicaid">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Primary Language</label>
-                            <span id="prof-language">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Gender</label>
-                            <span id="prof-gender">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header"><h3>Primary Care Physician</h3></div>
-                    <div class="card-body">
-                        <div class="profile-field">
-                            <label>Physician</label>
-                            <span id="prof-doctor">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Clinic Location</label>
-                            <span id="prof-docLoc">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header"><h3>Caregiver Preference</h3></div>
-                    <div class="card-body">
-                        <div class="profile-field">
-                            <label>Chosen PCW</label>
-                            <span id="prof-pcw">Loading...</span>
-                        </div>
-                        <div class="profile-field">
-                            <label>Enrollment Status</label>
-                            <span id="prof-status">Loading...</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- ... existing cards ... -->
             </div>
         </div>
 
@@ -626,75 +561,100 @@
                     <p class="page-subtitle">Secure communication with your care team</p>
                 </div>
                 <div class="page-actions">
-                    <button class="btn-portal" onclick="alert('Opening new message composer...')">
+                    <button class="btn-portal" id="openMessageComposer">
                         <i class="fa-solid fa-pen-to-square"></i> New Message
                     </button>
                 </div>
             </div>
 
             <div class="card">
-                <div class="message-list">
-                    <div class="message-item unread">
-                        <div class="msg-avatar rn">RN</div>
-                        <div class="msg-content">
-                            <div class="msg-header">
-                                <strong>Rachel N., RN</strong>
-                                <time>Today, 9:20 AM</time>
-                            </div>
-                            <h4>Care Plan Update — Medication Schedule</h4>
-                            <p>Hi Maria, I've updated your care plan to reflect the new medication times from Dr. Williams. Sarah has been briefed on the changes. Please let me know if you have any questions.</p>
-                        </div>
-                        <span class="unread-dot"></span>
-                    </div>
-                    <div class="message-item unread">
-                        <div class="msg-avatar cc">JD</div>
-                        <div class="msg-content">
-                            <div class="msg-header">
-                                <strong>Jessica D.</strong>
-                                <time>Yesterday, 4:15 PM</time>
-                            </div>
-                            <h4>Quarterly Review Scheduled</h4>
-                            <p>Hi Maria, your quarterly review with RN Rachel has been scheduled for April 22nd at 10:00 AM. She will visit your home for the assessment. Please have your medication list ready.</p>
-                        </div>
-                        <span class="unread-dot"></span>
-                    </div>
-                    <div class="message-item unread">
-                        <div class="msg-avatar">SM</div>
-                        <div class="msg-content">
-                            <div class="msg-header">
-                                <strong>Sarah M.</strong>
-                                <time>Apr 14, 11:00 AM</time>
-                            </div>
-                            <h4>Morning Visit Note</h4>
-                            <p>Good morning Maria! Just a heads up — I'll be arriving about 10 minutes early tomorrow. Also, I picked up the prescription from Walgreens as requested. See you in the morning!</p>
-                        </div>
-                        <span class="unread-dot"></span>
-                    </div>
-                    <div class="message-item">
-                        <div class="msg-avatar rn">RN</div>
-                        <div class="msg-content">
-                            <div class="msg-header">
-                                <strong>Rachel N., RN</strong>
-                                <time>Apr 10, 2:30 PM</time>
-                            </div>
-                            <h4>Assessment Complete</h4>
-                            <p>Maria, your quarterly assessment is complete. Everything looks great — I'm very pleased with your progress. I've uploaded the report to your Documents section.</p>
-                        </div>
-                    </div>
-                    <div class="message-item">
-                        <div class="msg-avatar cc">JD</div>
-                        <div class="msg-content">
-                            <div class="msg-header">
-                                <strong>Jessica D.</strong>
-                                <time>Apr 8, 10:00 AM</time>
-                            </div>
-                            <h4>Welcome to Heritage Connect!</h4>
-                            <p>Hi Maria! Welcome to the Heritage Connect portal. You can use this portal to view your visit history, care plan, upcoming schedule, and securely message your care team. Don't hesitate to reach out if you need help navigating.</p>
-                        </div>
+                <div class="message-list" id="realMessageList">
+                    <!-- Populated by JS -->
+                    <div class="text-center" style="padding: 40px; color: var(--text-muted);">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                        <p>Loading your secure messages...</p>
                     </div>
                 </div>
             </div>
         </div>
+
+    </main>
+
+    <!-- ═══════════ MODALS ═══════════ -->
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal-overlay-custom">
+        <div class="modal-container-custom">
+            <div class="modal-header-custom">
+                <h3>Edit Profile Information</h3>
+                <button class="close-modal-custom" id="closeEditProfile">&times;</button>
+            </div>
+            <form id="editProfileForm" class="modal-body-custom">
+                <div class="form-grid-custom">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="firstName" class="form-input-custom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="lastName" class="form-input-custom" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" name="pcwPhone" class="form-input-custom">
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" name="address" class="form-input-custom">
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" name="city" class="form-input-custom">
+                    </div>
+                    <div class="form-group">
+                        <label>Zip Code</label>
+                        <input type="text" name="zip" class="form-input-custom">
+                    </div>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="btn-outline-custom" id="cancelEditProfile">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Composer Modal -->
+    <div id="messageModal" class="modal-overlay-custom">
+        <div class="modal-container-custom">
+            <div class="modal-header-custom">
+                <h3>New Secure Message</h3>
+                <button class="close-modal-custom" id="closeMessageComposer">&times;</button>
+            </div>
+            <form id="messageForm" class="modal-body-custom">
+                <div class="form-group">
+                    <label>Recipient</label>
+                    <select name="recipient" class="form-input-custom">
+                        <option value="coordinator">Jessica D. (Care Coordinator)</option>
+                        <option value="nurse">Rachel N., RN (Supervising Nurse)</option>
+                        <option value="billing">Billing Department</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" class="form-input-custom" required placeholder="e.g., Schedule Change Request">
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="body" class="form-input-custom" style="height: 150px;" required placeholder="Type your secure message here..."></textarea>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="btn-outline-custom" id="cancelMessage">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     </main>
 
