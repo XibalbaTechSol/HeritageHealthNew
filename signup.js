@@ -1,7 +1,41 @@
 /**
  * SIGNUP & INTAKE LOGIC — Heritage Connect
- * Handles multi-step form navigation, signature capture, and data submission.
+ * Handles multi-step form navigation, signature capture, 
+ * automated PDF generation, Firebase Auth/Firestore, and EmailJS delivery.
+ * Using Firebase Modular SDK (v9+).
  */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Global libraries loaded via CDN in HTML
+const PDFLib = window.PDFLib;
+const SignaturePad = window.SignaturePad;
+const emailjs = window.emailjs;
+
+// ─── CONFIGURATION ───
+const firebaseConfig = {
+  apiKey: "AIzaSyA3CvTjZ03mg0yjqK8WW-doRb7vcCP-cHQ",
+  authDomain: "hhs-new.firebaseapp.com",
+  projectId: "hhs-new",
+  storageBucket: "hhs-new.firebasestorage.app",
+  messagingSenderId: "996139618301",
+  appId: "1:996139618301:web:6b2326edda6968f809d394",
+  measurementId: "G-Q8NZ603J99"
+};
+
+// TODO: Replace with your credentials from EmailJS Dashboard
+const emailjsConfig = {
+    publicKey: "YOUR_PUBLIC_KEY",
+    serviceId: "YOUR_SERVICE_ID",
+    templateId: "YOUR_TEMPLATE_ID"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -13,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
 
     function updateWizard() {
-        // Update Form Steps
         steps.forEach(step => {
             step.classList.remove('active');
             if (parseInt(step.id.replace('step', '')) === currentStep) {
@@ -21,15 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Update Sidebar UI
         wizardSteps.forEach(ws => {
             const stepNum = parseInt(ws.dataset.step);
             ws.classList.remove('active', 'completed');
-            if (stepNum === currentStep) {
-                ws.classList.add('active');
-            } else if (stepNum < currentStep) {
-                ws.classList.add('completed');
-            }
+            if (stepNum === currentStep) ws.classList.add('active');
+            else if (stepNum < currentStep) ws.classList.add('completed');
         });
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -37,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     nextBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Basic validation for required fields in current step
             const currentStepEl = document.getElementById(`step${currentStep}`);
             const inputs = currentStepEl.querySelectorAll('[required]');
             let valid = true;
@@ -77,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
             penColor: 'rgb(10, 31, 58)'
         });
 
-        // Resize canvas for high DPI screens
         function resizeCanvas() {
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
@@ -98,15 +125,100 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── CONDITIONAL FIELDS ───
     const prevAgencyRadios = document.querySelectorAll('input[name="prevAgency"]');
     const whichAgencyGroup = document.getElementById('whichAgencyGroup');
-    
-    prevAgencyRadios.forEach(r => {
-        r.addEventListener('change', () => {
-            whichAgencyGroup.style.display = (r.value === 'yes') ? 'block' : 'none';
+    if (prevAgencyRadios && whichAgencyGroup) {
+        prevAgencyRadios.forEach(r => {
+            r.addEventListener('change', () => {
+                whichAgencyGroup.style.display = (r.value === 'yes') ? 'block' : 'none';
+            });
         });
-    });
+    }
 
 
-    // ─── DATA SUBMISSION (STUB FOR NOW) ───
+    // ─── PDF PROCESSING (pdf-lib) ───
+    async function generateSignedPDFs(data) {
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        const attachments = [];
+
+        async function processPDF(fileName, drawLogic) {
+            const url = `./${fileName}`;
+            const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer());
+            const pdfDoc = await PDFDocument.load(existingPdfBytes);
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            const pages = pdfDoc.getPages();
+            const firstPage = pages[0];
+            
+            let sigImage = null;
+            if (data.signature) {
+                sigImage = await pdfDoc.embedPng(data.signature);
+            }
+
+            drawLogic(firstPage, font, sigImage, rgb);
+            
+            // Output as base64 string for EmailJS
+            const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
+            attachments.push({
+                name: fileName.replace('.pdf', '_Signed.pdf'),
+                data: pdfBase64
+            });
+        }
+
+        // 1. Referral Form Mapping
+        await processPDF('New-Client-Referral2017.pdf', (page, font, sig, rgb) => {
+            const { height } = page.getSize();
+            const draw = (text, x, y, size = 10) => {
+                if (text) page.drawText(String(text), { x, y: height - y, size, font });
+            };
+            draw(new Date().toLocaleDateString(), 550, 195);
+            draw(`${data.lastName}, ${data.firstName}`, 100, 255);
+            draw(data.ssn, 70, 272);
+            draw(data.pcwPhone, 450, 272);
+            draw(data.dob, 70, 305);
+            draw(data.language, 420, 305);
+            draw(data.gender, 760, 305);
+            draw(data.address, 130, 345);
+            draw(data.city, 400, 345);
+            draw(data.zip, 720, 345);
+            draw(data.medicaidNumber, 150, 395);
+            draw(data.doctorName, 170, 415);
+            draw(data.doctorLocation, 600, 415);
+            draw(data.pcwName, 200, 855);
+        });
+
+        // 2. Medical Release Mapping
+        await processPDF('Medical-Release2017.pdf', (page, font, sig, rgb) => {
+            const { height } = page.getSize();
+            const draw = (text, x, y, size = 11) => {
+                if (text) page.drawText(String(text), { x, y: height - y, size, font });
+            };
+            draw(data.doctorName, 300, 420);
+            draw(new Date().toLocaleDateString(), 420, 695);
+            draw(`${data.firstName} ${data.lastName}`, 300, 755);
+            draw(data.dob, 200, 868);
+            draw(data.pcwPhone, 600, 868);
+            if (sig) page.drawImage(sig, { x: 300, y: height - 820, width: 150, height: 40 });
+        });
+
+        // 3. Wheaton Mapping
+        await processPDF('Medical-Rec-Release-Wheaton.pdf', (page, font, sig, rgb) => {
+            const { height } = page.getSize();
+            const draw = (text, x, y, size = 10) => {
+                if (text) page.drawText(String(text), { x, y: height - y, size, font });
+            };
+            draw(data.lastName, 100, 82);
+            draw(data.firstName, 550, 82);
+            draw(data.address + ", " + data.city + ", WI " + data.zip, 100, 115);
+            draw(data.dob, 100, 142);
+            draw(data.gender, 250, 142);
+            draw(data.pcwPhone, 550, 142);
+            draw(new Date().toLocaleDateString(), 820, 755);
+            if (sig) page.drawImage(sig, { x: 250, y: height - 765, width: 150, height: 40 });
+        });
+
+        return attachments;
+    }
+
+
+    // ─── FINAL DATA SUBMISSION ───
     const intakeForm = document.getElementById('intakeForm');
     
     intakeForm.addEventListener('submit', async (e) => {
@@ -118,32 +230,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const submitBtn = document.getElementById('submitIntake');
-        submitBtn.textContent = "Processing Enrollment...";
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = "Processing & Securing Enrollment...";
         submitBtn.disabled = true;
 
-        // Collect all form data
-        const formData = new FormData(intakeForm);
-        const data = Object.fromEntries(formData.entries());
-        
-        // Add Signature
-        data.signature = signaturePad.toDataURL();
+        try {
+            const formData = new FormData(intakeForm);
+            const data = Object.fromEntries(formData.entries());
+            data.signature = signaturePad.toDataURL();
 
-        console.log("Collected Intake Data:", data);
+            // 1. Create User in Firebase
+            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+            const uid = userCredential.user.uid;
 
-        /**
-         * TODO: PHASE 3 & 4
-         * 1. Initialize Firebase (Auth & Firestore)
-         * 2. Save 'data' to Firestore
-         * 3. Initialize pdf-lib
-         * 4. Fill blank PDFs and stamp 'data.signature'
-         * 5. Use EmailJS to send base64 PDFs to agency
-         */
+            // 2. Generate Signed PDFs in Browser
+            const signedFiles = await generateSignedPDFs(data);
 
-        // Simulate success for now
-        setTimeout(() => {
-            alert("Success! Your clinical profile has been created and your authorization forms have been generated. Redirecting to Heritage Connect...");
+            // 3. Save Profile Data to Firestore
+            const cleanData = { ...data };
+            delete cleanData.password;
+            delete cleanData.confirmPassword;
+            cleanData.uid = uid;
+            cleanData.submittedAt = serverTimestamp();
+            cleanData.status = "Pending Review";
+            
+            await setDoc(doc(db, "clients", uid), cleanData);
+
+            // 4. Send Signed Packet via EmailJS
+            emailjs.init(emailjsConfig.publicKey);
+            await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
+                client_name: `${data.firstName} ${data.lastName}`,
+                client_email: data.email,
+                client_phone: data.pcwPhone,
+                referral_doc: signedFiles[0].data,
+                release_doc_1: signedFiles[1].data,
+                release_doc_2: signedFiles[2].data
+            });
+
+            alert("Success! Your account has been created, your clinical profile saved, and signed forms sent to our team. Redirecting to Heritage Connect...");
             window.location.href = 'portal.html';
-        }, 2000);
+
+        } catch (err) {
+            console.error("Enrollment Error:", err);
+            alert("An error occurred: " + err.message);
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+        }
     });
 
 });
