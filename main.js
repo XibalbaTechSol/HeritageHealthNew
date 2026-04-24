@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ─── UTILS ───
+    function safeAddListener(id, event, callback) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener(event, callback);
+    }
+
     // ─── Mobile Menu Toggle ───
     const mobileToggle = document.getElementById('mobileToggle');
     const navList = document.querySelector('.nav-list');
-
-    if (mobileToggle) {
+    if (mobileToggle && navList) {
         mobileToggle.addEventListener('click', () => {
             navList.classList.toggle('active');
             mobileToggle.classList.toggle('active');
@@ -15,38 +20,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.site-header');
     if (header) {
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
         }, { passive: true });
     }
 
-    // ─── Reveal on Scroll (Intersection Observer) ───
+    // ─── Reveal on Scroll ───
     const revealElements = document.querySelectorAll('.reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entries[0].isIntersecting) {
-                entry.target.classList.add('active');
-            }
-        });
-    }, { threshold: 0.1 });
+    if (revealElements.length > 0) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => revealObserver.observe(el));
+    }
 
-    revealElements.forEach(el => revealObserver.observe(el));
-
-    // ─── Smooth Scroll for anchor links ───
+    // ─── Smooth Scroll ───
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const target = document.querySelector(targetId);
             if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                // Close mobile menu if open
-                if (navList.classList.contains('active')) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (navList && navList.classList.contains('active')) {
                     navList.classList.remove('active');
                     mobileToggle.classList.remove('active');
                 }
@@ -63,134 +62,32 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = 'Signing In...';
             btn.style.opacity = '0.7';
             btn.disabled = true;
-            setTimeout(() => {
-                window.location.href = 'portal.html';
-            }, 800);
+            setTimeout(() => { window.location.href = 'portal.html'; }, 800);
         });
     }
 
     // ─── Chatbot ───
     const chatBubble = document.getElementById('chatBubble');
     const chatWindow = document.getElementById('chatWindow');
-    const closeChat = document.getElementById('closeChat');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
-    // System Prompt for Clinical Persona
-    const SYSTEM_PROMPT = `You are the Heritage Health Services clinical support AI. 
-    Your persona: Professional, RN-led, authoritative yet compassionate.
-    Context: Heritage Health Services is a premium personal care agency in Southeast Wisconsin (serving Milwaukee, Racine, Kenosha, and surrounding counties).
-    Key Topics:
-    1. 'Get Paid to Care' program: Family/friends can be paid PCWs through Medicaid/Title 19.
-    2. RN-led Assessments: We offer free in-home assessments.
-    3. Services: ADLs, transfers, hygiene, morning/evening routines, etc.
-    4. Compliance: We emphasize clinical transparency and ethical care.
-    Guidelines: 
-    - Keep responses concise (under 3 sentences unless complex).
-    - Always recommend a free RN assessment for specific medical inquiries.
-    - Mention (262) 554-8800 for immediate support.
-    - If you don't know something, refer them to a human coordinator.`;
+    const SYSTEM_PROMPT = "You are the Heritage Health Services clinical support AI. Be professional and compassionate. If you don't know something, refer them to (262) 554-8800.";
 
-    let GEMINI_API_KEY = sessionStorage.getItem('HHS_CHAT_KEY');
-
-    async function callGemini(userMessage) {
-        if (!GEMINI_API_KEY) {
-            GEMINI_API_KEY = prompt("To enable Real AI Chat, please enter your Gemini API Key (This is stored only in your current session):");
-            if (GEMINI_API_KEY) sessionStorage.setItem('HHS_CHAT_KEY', GEMINI_API_KEY);
-            else return null;
-        }
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${userMessage}` }]
-                    }]
-                })
-            });
-
-            if (!response.ok) throw new Error('API Error');
-            const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
-        } catch (e) {
-            console.error("Gemini Error:", e);
-            return null;
-        }
-    }
-
-    if (chatBubble) {
+    if (chatBubble && chatWindow) {
         chatBubble.addEventListener('click', () => {
             chatWindow.classList.toggle('active');
-            if (chatWindow.classList.contains('active')) {
-                chatInput.focus();
-            }
+            if (chatWindow.classList.contains('active') && chatInput) chatInput.focus();
         });
     }
 
-    if (closeChat) {
-        closeChat.addEventListener('click', () => {
-            chatWindow.classList.remove('active');
-        });
-    }
-
-    if (chatForm) {
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = chatInput.value.trim();
-            if (!message) return;
-
-            appendMessage('user', message);
-            chatInput.value = '';
-
-            // Typing indicator
-            const typing = document.createElement('div');
-            typing.className = 'message bot';
-            typing.innerHTML = '<em style="opacity:0.5;">typing...</em>';
-            chatMessages.appendChild(typing);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // Try Gemini First
-            const aiResponse = await callGemini(message);
-            
-            if (chatMessages.contains(typing)) {
-                chatMessages.removeChild(typing);
-            }
-            
-            if (aiResponse) {
-                appendMessage('bot', aiResponse);
-            } else {
-                handleFallback(message);
-            }
-        });
-    }
-
-    function handleFallback(message) {
-        const lower = message.toLowerCase();
-        let response;
-
-        if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
-            response = "Through our 'Get Paid to Care' program, family members and friends can often be compensated for providing care! Individuals who receive Title 19 or Medicaid have the right to choose their own personal care aid. Would you like to learn more about enrollment?";
-        } else if (lower.includes('assessment') || lower.includes('new') || lower.includes('start') || lower.includes('enroll')) {
-            response = "We offer free in-home Registered Nurse assessments across all of Southeast Wisconsin. You can download the New Client Form, Medical Release, and Wheaton Release in our 'New Clients' section, or I can help you schedule one directly.";
-        } else if (lower.includes('service') || lower.includes('help') || lower.includes('care')) {
-            response = "We offer a full range of personal care services including morning & evening routines, transfer assistance, dressing help, personal hygiene, incontinence care, and bathing & showering assistance. All with a Registered Nurse-led support team. Would you like details on any specific service?";
-        } else if (lower.includes('contact') || lower.includes('phone') || lower.includes('address') || lower.includes('office')) {
-            response = "You can reach us at (262) 554-8800, email Info@wihhs.com, or visit us at 5331 Spring St. Suite 101, Mt. Pleasant, WI 53406. Our office hours are Monday – Friday, 10am to 4pm.";
-        } else if (lower.includes('county') || lower.includes('area') || lower.includes('where') || lower.includes('location')) {
-            response = "We proudly serve Milwaukee, Racine, Kenosha, Dane, Dodge, Jefferson, Ozaukee, Rock, Walworth, Washington, and Waukesha Counties in Wisconsin.";
-        } else {
-            response = "Thank you for your inquiry. A Heritage Health care coordinator would be happy to discuss that with you. You can call us at (262) 554-8800 or would you like me to help you schedule a free home assessment?";
-        }
-
-        appendMessage('bot', response);
-    }
+    safeAddListener('closeChat', 'click', () => {
+        if (chatWindow) chatWindow.classList.remove('active');
+    });
 
     function appendMessage(sender, text) {
+        if (!chatMessages) return;
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}`;
         msgDiv.textContent = text;
@@ -198,26 +95,69 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // ─── Parallax effect on hero background ───
-    const heroBg = document.querySelector('.hero-bg-container');
-    if (heroBg) {
-        window.addEventListener('scroll', () => {
-            const y = window.scrollY;
-            if (y < window.innerHeight) {
-                heroBg.style.transform = `scale(1.05) translateY(${y * 0.15}px)`;
-            }
-        }, { passive: true });
+    async function callGemini(msg) {
+        let key = sessionStorage.getItem('HHS_CHAT_KEY');
+        if (!key) {
+            key = prompt("Please enter your Gemini API Key to enable AI chat:");
+            if (key) sessionStorage.setItem('HHS_CHAT_KEY', key);
+            else return null;
+        }
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser: ${msg}` }] }] })
+            });
+            const data = await resp.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     }
 
-    // ─── Hero Background Carousel ───
+    function handleFallback(message) {
+        const lower = message.toLowerCase();
+        let response = "Thank you for your inquiry. Please call us at (262) 554-8800 for immediate assistance.";
+        if (lower.includes('caregiver') || lower.includes('paid')) {
+            response = "Family members can often be paid to provide care through Medicaid! Contact us to learn about enrollment.";
+        } else if (lower.includes('assessment')) {
+            response = "We offer free in-home RN assessments. Would you like to schedule one?";
+        }
+        appendMessage('bot', response);
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+
+            appendMessage('user', msg);
+            chatInput.value = '';
+
+            const typing = document.createElement('div');
+            typing.className = 'message bot';
+            typing.innerHTML = '<em>typing...</em>';
+            chatMessages.appendChild(typing);
+
+            const aiResp = await callGemini(msg);
+            if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
+
+            if (aiResp) appendMessage('bot', aiResp);
+            else handleFallback(msg);
+        });
+    }
+
+    // ─── Hero Background ───
     const slides = document.querySelectorAll('.hero-bg-slide');
     if (slides.length > 0) {
-        let currentSlide = 0;
+        let cur = 0;
         setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+            slides[cur].classList.remove('active');
+            cur = (cur + 1) % slides.length;
+            slides[cur].classList.add('active');
         }, 5000);
     }
-
 });
