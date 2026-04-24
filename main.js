@@ -1,140 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ─── Hero loaded animation ───
-    const hero = document.querySelector('.hero');
-    if (hero) {
-        requestAnimationFrame(() => hero.classList.add('loaded'));
+    // ─── Mobile Menu Toggle ───
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navList = document.querySelector('.nav-list');
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', () => {
+            navList.classList.toggle('active');
+            mobileToggle.classList.toggle('active');
+        });
     }
 
-    // ─── Header scroll behavior ───
-    const header = document.getElementById('siteHeader');
-    let lastScroll = 0;
-
-    function onScroll() {
-        const y = window.scrollY;
-        if (header) {
-            if (y > 60) {
+    // ─── Header Scroll Logic ───
+    const header = document.querySelector('.site-header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
             }
-        }
-        lastScroll = y;
+        }, { passive: true });
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // run once on load
-
-    // ─── Mobile Navigation ───
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-    const navClose = document.getElementById('navClose');
-
-    if (navToggle) {
-        navToggle.addEventListener('click', () => {
-            navMenu.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-    }
-
-    function closeMenu() {
-        navMenu.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    if (navClose) {
-        navClose.addEventListener('click', closeMenu);
-    }
-
-    // Close on nav link click
-    document.querySelectorAll('.nav-link, .nav-cta').forEach(link => {
-        link.addEventListener('click', closeMenu);
-    });
-
-    // ─── Active nav link on scroll ───
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    function updateActiveNav() {
-        const scrollPos = window.scrollY + 120;
-        sections.forEach(section => {
-            const top = section.offsetTop;
-            const bottom = top + section.offsetHeight;
-            const id = section.getAttribute('id');
-            if (scrollPos >= top && scrollPos < bottom) {
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${id}`) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-        });
-    }
-
-    window.addEventListener('scroll', updateActiveNav, { passive: true });
-
-    // ─── Smooth scroll for all anchor links ───
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                const offset = 80;
-                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-                window.scrollTo({ top, behavior: 'smooth' });
-            }
-        });
-    });
-
-    // ─── Reveal on scroll (Intersection Observer) ───
+    // ─── Reveal on Scroll (Intersection Observer) ───
     const revealElements = document.querySelectorAll('.reveal');
-
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                revealObserver.unobserve(entry.target);
+            if (entries[0].isIntersecting) {
+                entry.target.classList.add('active');
             }
         });
-    }, {
-        threshold: 0.12,
-        rootMargin: '0px 0px -40px 0px'
-    });
+    }, { threshold: 0.1 });
 
     revealElements.forEach(el => revealObserver.observe(el));
 
-    // ─── Form submissions ───
-    const forms = {
-        assessmentForm: 'Thank you! Your assessment request has been submitted. A Heritage Health care coordinator will contact you shortly.',
-        contactForm: 'Message sent! We typically respond within one business day.'
-    };
-
-    Object.entries(forms).forEach(([id, message]) => {
-        const form = document.getElementById(id);
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const btn = form.querySelector('button[type="submit"]');
-                const original = btn.textContent;
-                btn.textContent = '✓ Submitted';
-                btn.style.opacity = '0.7';
-                btn.disabled = true;
-
-                setTimeout(() => {
-                    alert(message);
-                    btn.textContent = original;
-                    btn.style.opacity = '1';
-                    btn.disabled = false;
-                    form.reset();
-                }, 400);
-            });
-        }
+    // ─── Smooth Scroll for anchor links ───
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Close mobile menu if open
+                if (navList.classList.contains('active')) {
+                    navList.classList.remove('active');
+                    mobileToggle.classList.remove('active');
+                }
+            }
+        });
     });
 
-    // Portal form → redirect to portal
+    // ─── Portal Form Simulation ───
     const portalForm = document.getElementById('portalForm');
     if (portalForm) {
         portalForm.addEventListener('submit', (e) => {
@@ -183,19 +103,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${userMessage}` }]
-                }]
-            })
-        });
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${userMessage}` }]
+                    }]
+                })
+            });
 
-        if (!response.ok) throw new Error('API Error');
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
+            if (!response.ok) throw new Error('API Error');
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch (e) {
+            console.error("Gemini Error:", e);
+            return null;
+        }
     }
 
     if (chatBubble) {
@@ -229,20 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.appendChild(typing);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            try {
-                // Try Gemini First
-                const aiResponse = await callGemini(message);
+            // Try Gemini First
+            const aiResponse = await callGemini(message);
+            
+            if (chatMessages.contains(typing)) {
                 chatMessages.removeChild(typing);
-                
-                if (aiResponse) {
-                    appendMessage('bot', aiResponse);
-                } else {
-                    // Fallback if they cancelled the prompt
-                    handleFallback(message);
-                }
-            } catch (err) {
-                console.error("Gemini Error:", err);
-                chatMessages.removeChild(typing);
+            }
+            
+            if (aiResponse) {
+                appendMessage('bot', aiResponse);
+            } else {
                 handleFallback(message);
             }
         });
@@ -268,9 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appendMessage('bot', response);
     }
-            }, 900);
-        });
-    }
 
     function appendMessage(sender, text) {
         const msgDiv = document.createElement('div');
@@ -293,13 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Hero Background Carousel ───
     const slides = document.querySelectorAll('.hero-bg-slide');
-    if (slides.length > 1) {
+    if (slides.length > 0) {
         let currentSlide = 0;
         setInterval(() => {
             slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
-        }, 10000); // 10 seconds
+        }, 5000);
     }
 
 });
