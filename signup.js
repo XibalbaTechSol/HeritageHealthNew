@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emailjs.init(emailjsConfig.publicKey);
             await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
                 client_name: `${data.firstName} ${data.lastName}`,
-                client_email: data.email,
+                client_email: data.email || auth.currentUser.email,
                 client_phone: data.pcwPhone,
                 referral_doc: signedFiles[0].data,
                 release_doc_1: signedFiles[1].data,
