@@ -767,6 +767,37 @@
 
     </main>
 
+    <!-- ═══════════ CHATBOT ═══════════ -->
+    <div class="chatbot-bubble" id="chatBubble">
+        <i class="fa-solid fa-comment-dots"></i>
+    </div>
+
+    <div class="chatbot-window" id="chatWindow">
+        <div class="chatbot-header">
+            <div class="chatbot-header-title">
+                <div class="chatbot-header-dot"></div>
+                <span>Heritage Support</span>
+            </div>
+            <button class="close-btn" id="closeChat"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">
+                Welcome to Heritage Health Services. How may we assist you with your personal care needs or caregiver coordination today?
+            </div>
+        </div>
+        <form class="chatbot-input" id="chatForm">
+            <input type="text" id="chatInput" placeholder="Type your question..." autocomplete="off">
+            <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+    </div>
+
+    <!-- ═══════════ CALL BUBBLE ═══════════ -->
+    <a href="tel:262-554-8800" class="call-bubble" id="callBubble" aria-label="Call Heritage Health Services">
+        <i class="fa-solid fa-phone"></i>
+        <span class="call-text">Call (262) 554-8800</span>
+    </a>
+
     <script src="portal.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
