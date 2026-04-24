@@ -327,11 +327,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 await setDoc(doc(db, "clients", uid), cleanData, { merge: true });
 
-                // emailjs implementation needs your real keys to work
-                // emailjs.init("YOUR_PUBLIC_KEY");
-                // await emailjs.send("SERVICE_ID", "TEMPLATE_ID", { ... });
+                // 4. Send Signed Packet via EmailJS (Non-blocking fail-safe)
+                try {
+                    const PK = "YOUR_PUBLIC_KEY"; // Replace with your real public key
+                    if (PK !== "YOUR_PUBLIC_KEY") {
+                        emailjs.init(PK);
+                        await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                            client_name: `${data.firstName} ${data.lastName}`,
+                            client_email: data.email || auth.currentUser.email,
+                            client_phone: data.pcwPhone,
+                            referral_doc: signedFiles[0].data,
+                            release_doc_1: signedFiles[1].data,
+                            release_doc_2: signedFiles[2].data
+                        });
+                        console.log("EmailJS: Packet sent successfully.");
+                    } else {
+                        console.warn("EmailJS: Skipping email delivery (using placeholder keys).");
+                    }
+                } catch (emailErr) {
+                    console.error("EmailJS Error (Continuing anyway):", emailErr);
+                }
 
-                alert("Success! Your profile has been updated and signed forms have been generated. Redirecting to Heritage Connect...");
+                alert("Success! Your account has been created and your signed authorization forms have been generated. Redirecting to Heritage Connect...");
                 window.location.href = '/portal';
 
             } catch (err) {
