@@ -326,12 +326,34 @@
 
             <div class="docs-grid" id="signedDocsGrid">
                 <div class="card doc-card" id="doc-enrollment">
-                    <div class="doc-icon"><i class="fa-solid fa-file-signature"></i></div>
+                    <div class="doc-icon"><i class="fa-solid fa-file-contract"></i></div>
                     <div class="doc-info">
-                        <h4>Signed Enrollment Packet</h4>
-                        <p>Includes Referral & Medical Releases</p>
+                        <h4>New Client Referral</h4>
+                        <p>Primary intake and demographics form</p>
                     </div>
-                    <button class="doc-action" id="viewSignedPacket" title="View/Download Signed PDF">
+                    <button class="doc-action download-trigger" data-file-index="0" title="Download Signed PDF">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                </div>
+
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-file-medical"></i></div>
+                    <div class="doc-info">
+                        <h4>Medical Release (ROI)</h4>
+                        <p>Standard authorization for health records</p>
+                    </div>
+                    <button class="doc-action download-trigger" data-file-index="1" title="Download Signed PDF">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                </div>
+
+                <div class="card doc-card">
+                    <div class="doc-icon"><i class="fa-solid fa-hospital-user"></i></div>
+                    <div class="doc-info">
+                        <h4>Wheaton Records Release</h4>
+                        <p>Specific authorization for Wheaton facilities</p>
+                    </div>
+                    <button class="doc-action download-trigger" data-file-index="2" title="Download Signed PDF">
                         <i class="fa-solid fa-download"></i>
                     </button>
                 </div>
