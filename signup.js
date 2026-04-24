@@ -6,7 +6,7 @@
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Global libraries loaded via CDN in HTML
@@ -36,8 +36,33 @@ const emailjsConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ─── GOOGLE SIGN IN ───
+    const googleBtn = document.querySelector('.btn-social.google');
+    if (googleBtn) {
+        googleBtn.addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                console.log("Google User:", user.email);
+                
+                // Pre-fill email if possible
+                const emailInput = document.querySelector('input[name="email"]');
+                if (emailInput) emailInput.value = user.email;
+
+                // Advance to Demographics Step automatically
+                currentStep = 2;
+                updateWizard();
+                
+            } catch (error) {
+                console.error("Google Auth Error:", error);
+                alert("Google Sign-In failed: " + error.message);
+            }
+        });
+    }
     
     // ─── WIZARD NAVIGATION ───
     const steps = document.querySelectorAll('.form-step');
@@ -239,9 +264,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = Object.fromEntries(formData.entries());
             data.signature = signaturePad.toDataURL();
 
-            // 1. Create User in Firebase
-            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-            const uid = userCredential.user.uid;
+            let uid;
+            
+            // 1. Handle User Creation/Retrieval
+            // If the user used Google, they are already signed in.
+            // If they filled out the password fields, we create them.
+            if (auth.currentUser) {
+                uid = auth.currentUser.uid;
+            } else if (data.email && data.password) {
+                const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+                uid = userCredential.user.uid;
+            } else {
+                throw new Error("Please complete the Account Setup (Step 1) before submitting.");
+            }
 
             // 2. Generate Signed PDFs in Browser
             const signedFiles = await generateSignedPDFs(data);
@@ -254,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cleanData.submittedAt = serverTimestamp();
             cleanData.status = "Pending Review";
             
-            await setDoc(doc(db, "clients", uid), cleanData);
+            await setDoc(doc(db, "clients", uid), cleanData, { merge: true });
 
             // 4. Send Signed Packet via EmailJS
             emailjs.init(emailjsConfig.publicKey);
