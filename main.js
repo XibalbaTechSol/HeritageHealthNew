@@ -157,6 +157,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
+    // System Prompt for Clinical Persona
+    const SYSTEM_PROMPT = `You are the Heritage Health Services clinical support AI. 
+    Your persona: Professional, RN-led, authoritative yet compassionate.
+    Context: Heritage Health Services is a premium personal care agency in Southeast Wisconsin (serving Milwaukee, Racine, Kenosha, and surrounding counties).
+    Key Topics:
+    1. 'Get Paid to Care' program: Family/friends can be paid PCWs through Medicaid/Title 19.
+    2. RN-led Assessments: We offer free in-home assessments.
+    3. Services: ADLs, transfers, hygiene, morning/evening routines, etc.
+    4. Compliance: We emphasize clinical transparency and ethical care.
+    Guidelines: 
+    - Keep responses concise (under 3 sentences unless complex).
+    - Always recommend a free RN assessment for specific medical inquiries.
+    - Mention (262) 554-8800 for immediate support.
+    - If you don't know something, refer them to a human coordinator.`;
+
+    let GEMINI_API_KEY = sessionStorage.getItem('HHS_CHAT_KEY');
+
+    async function callGemini(userMessage) {
+        if (!GEMINI_API_KEY) {
+            GEMINI_API_KEY = prompt("To enable Real AI Chat, please enter your Gemini API Key (This is stored only in your current session):");
+            if (GEMINI_API_KEY) sessionStorage.setItem('HHS_CHAT_KEY', GEMINI_API_KEY);
+            else return null;
+        }
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${userMessage}` }]
+                }]
+            })
+        });
+
+        if (!response.ok) throw new Error('API Error');
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+    }
+
     if (chatBubble) {
         chatBubble.addEventListener('click', () => {
             chatWindow.classList.toggle('active');
@@ -173,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (chatForm) {
-        chatForm.addEventListener('submit', (e) => {
+        chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = chatInput.value.trim();
             if (!message) return;
@@ -188,26 +229,45 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.appendChild(typing);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            setTimeout(() => {
+            try {
+                // Try Gemini First
+                const aiResponse = await callGemini(message);
                 chatMessages.removeChild(typing);
-                const lower = message.toLowerCase();
-                let response;
-
-                if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
-                    response = "Through our 'Get Paid to Care' program, family members and friends can often be compensated for providing care! Individuals who receive Title 19 or Medicaid have the right to choose their own personal care aid. Would you like to learn more about enrollment?";
-                } else if (lower.includes('assessment') || lower.includes('new') || lower.includes('start') || lower.includes('enroll')) {
-                    response = "We offer free in-home Registered Nurse assessments across all of Southeast Wisconsin. You can download the New Client Form, Medical Release, and Wheaton Release in our 'New Clients' section, or I can help you schedule one directly.";
-                } else if (lower.includes('service') || lower.includes('help') || lower.includes('care')) {
-                    response = "We offer a full range of personal care services including morning & evening routines, transfer assistance, dressing help, personal hygiene, incontinence care, and bathing & showering assistance. All with a Registered Nurse-led support team. Would you like details on any specific service?";
-                } else if (lower.includes('contact') || lower.includes('phone') || lower.includes('address') || lower.includes('office')) {
-                    response = "You can reach us at (262) 554-8800, email Info@wihhs.com, or visit us at 5331 Spring St. Suite 101, Mt. Pleasant, WI 53406. Our office hours are Monday – Friday, 10am to 4pm.";
-                } else if (lower.includes('county') || lower.includes('area') || lower.includes('where') || lower.includes('location')) {
-                    response = "We proudly serve Milwaukee, Racine, Kenosha, Dane, Dodge, Jefferson, Ozaukee, Rock, Walworth, Washington, and Waukesha Counties in Wisconsin.";
+                
+                if (aiResponse) {
+                    appendMessage('bot', aiResponse);
                 } else {
-                    response = "Thank you for your inquiry. A Heritage Health care coordinator would be happy to discuss that with you. You can call us at (262) 554-8800 or would you like me to help you schedule a free home assessment?";
+                    // Fallback if they cancelled the prompt
+                    handleFallback(message);
                 }
+            } catch (err) {
+                console.error("Gemini Error:", err);
+                chatMessages.removeChild(typing);
+                handleFallback(message);
+            }
+        });
+    }
 
-                appendMessage('bot', response);
+    function handleFallback(message) {
+        const lower = message.toLowerCase();
+        let response;
+
+        if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
+            response = "Through our 'Get Paid to Care' program, family members and friends can often be compensated for providing care! Individuals who receive Title 19 or Medicaid have the right to choose their own personal care aid. Would you like to learn more about enrollment?";
+        } else if (lower.includes('assessment') || lower.includes('new') || lower.includes('start') || lower.includes('enroll')) {
+            response = "We offer free in-home Registered Nurse assessments across all of Southeast Wisconsin. You can download the New Client Form, Medical Release, and Wheaton Release in our 'New Clients' section, or I can help you schedule one directly.";
+        } else if (lower.includes('service') || lower.includes('help') || lower.includes('care')) {
+            response = "We offer a full range of personal care services including morning & evening routines, transfer assistance, dressing help, personal hygiene, incontinence care, and bathing & showering assistance. All with a Registered Nurse-led support team. Would you like details on any specific service?";
+        } else if (lower.includes('contact') || lower.includes('phone') || lower.includes('address') || lower.includes('office')) {
+            response = "You can reach us at (262) 554-8800, email Info@wihhs.com, or visit us at 5331 Spring St. Suite 101, Mt. Pleasant, WI 53406. Our office hours are Monday – Friday, 10am to 4pm.";
+        } else if (lower.includes('county') || lower.includes('area') || lower.includes('where') || lower.includes('location')) {
+            response = "We proudly serve Milwaukee, Racine, Kenosha, Dane, Dodge, Jefferson, Ozaukee, Rock, Walworth, Washington, and Waukesha Counties in Wisconsin.";
+        } else {
+            response = "Thank you for your inquiry. A Heritage Health care coordinator would be happy to discuss that with you. You can call us at (262) 554-8800 or would you like me to help you schedule a free home assessment?";
+        }
+
+        appendMessage('bot', response);
+    }
             }, 900);
         });
     }
