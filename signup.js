@@ -11,12 +11,14 @@ import {
     createUserWithEmailAndPassword, 
     GoogleAuthProvider, 
     signInWithRedirect,
-    getRedirectResult
+    getRedirectResult,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { 
     getFirestore, 
     doc, 
     setDoc, 
+    getDoc,
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -42,60 +44,56 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// ─── HANDLE REDIRECT RESULT ───
-getRedirectResult(auth)
-    .then((result) => {
-        if (result && result.user) {
-            console.log("Google User Authenticated via Redirect:", result.user.email);
-            
-            // Pre-fill email
-            const emailInput = document.querySelector('input[name="email"]');
-            if (emailInput) emailInput.value = result.user.email;
+// ─── AUTH STATE & REDIRECT HANDLING ───
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        console.log("User detected:", user.email);
+        
+        // Pre-fill email in the form
+        const emailInput = document.querySelector('input[name="email"]');
+        if (emailInput) emailInput.value = user.email;
 
-            // Automatically move to Step 2
-            // Since this happens after reload, we need to ensure the wizard state is correct
-            // Note: In a production app, we might use sessionStorage to keep the wizard state across redirect
+        // Auto-create client profile if it doesn't exist
+        const clientDoc = await getDoc(doc(db, "clients", user.uid));
+        if (!clientDoc.exists()) {
+            console.log("New Google/Email User: Creating initial profile entry...");
+            await setDoc(doc(db, "clients", user.uid), {
+                uid: user.uid,
+                email: user.email,
+                status: "Registration In-Progress",
+                createdAt: serverTimestamp()
+            }, { merge: true });
         }
-    }).catch((error) => {
-        if (error.code !== 'auth/callback-internal-error') {
-            console.error("Redirect Auth Error:", error.code, error.message);
+
+        // If we are at Step 1 (Account Setup), move to Step 2 automatically
+        // This handles both returning from redirect AND immediate local login
+        if (window.currentIntakeStep === 1) {
+            window.currentIntakeStep = 2;
+            if (typeof window.updateWizardUI === 'function') window.updateWizardUI();
         }
-    });
+    }
+});
+
+// Handle the explicit redirect result from Google
+getRedirectResult(auth).catch((error) => {
+    if (error.code !== 'auth/callback-internal-error') {
+        console.error("Auth Redirect Error:", error.code, error.message);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ─── GOOGLE SIGN IN ───
-    const googleBtn = document.querySelector('.btn-social.google');
-    if (googleBtn) {
-        googleBtn.addEventListener('click', () => {
-            // Using Redirect for better mobile support and cross-origin compatibility
-            signInWithRedirect(auth, provider);
-        });
-    }
-    
-    // ─── WIZARD NAVIGATION ───
+    // ─── WIZARD STATE ───
     const steps = document.querySelectorAll('.form-step');
     const wizardSteps = document.querySelectorAll('.wizard-step');
     const nextBtns = document.querySelectorAll('.next-step');
     const prevBtns = document.querySelectorAll('.prev-step');
-    let currentStep = 1;
+    window.currentIntakeStep = 1;
 
-    // Check if we just returned from a Google redirect
-    // Simple check: if user is logged in but we are on step 1
-    const checkPostRedirect = setInterval(() => {
-        if (auth.currentUser && currentStep === 1) {
-            const emailInput = document.querySelector('input[name="email"]');
-            if (emailInput) emailInput.value = auth.currentUser.email;
-            currentStep = 2;
-            updateWizard();
-            clearInterval(checkPostRedirect);
-        }
-    }, 500);
-
-    function updateWizard() {
+    window.updateWizardUI = function() {
         steps.forEach(step => {
             step.classList.remove('active');
-            if (parseInt(step.id.replace('step', '')) === currentStep) {
+            if (parseInt(step.id.replace('step', '')) === window.currentIntakeStep) {
                 step.classList.add('active');
             }
         });
@@ -103,16 +101,24 @@ document.addEventListener('DOMContentLoaded', () => {
         wizardSteps.forEach(ws => {
             const stepNum = parseInt(ws.dataset.step);
             ws.classList.remove('active', 'completed');
-            if (stepNum === currentStep) ws.classList.add('active');
-            else if (stepNum < currentStep) ws.classList.add('completed');
+            if (stepNum === window.currentIntakeStep) ws.classList.add('active');
+            else if (stepNum < window.currentIntakeStep) ws.classList.add('completed');
         });
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ─── GOOGLE SIGN IN ───
+    const googleBtn = document.querySelector('.btn-social.google');
+    if (googleBtn) {
+        googleBtn.addEventListener('click', () => {
+            signInWithRedirect(auth, provider);
+        });
+    }
+
     nextBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const currentStepEl = document.getElementById(`step${currentStep}`);
+            const currentStepEl = document.getElementById(`step${window.currentIntakeStep}`);
             const inputs = currentStepEl.querySelectorAll('[required]');
             let valid = true;
             inputs.forEach(input => {
@@ -124,18 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (valid && currentStep < steps.length) {
-                currentStep++;
-                updateWizard();
+            if (valid && window.currentIntakeStep < steps.length) {
+                window.currentIntakeStep++;
+                window.updateWizardUI();
             }
         });
     });
 
     prevBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            if (currentStep > 1) {
-                currentStep--;
-                updateWizard();
+            if (window.currentIntakeStep > 1) {
+                window.currentIntakeStep--;
+                window.updateWizardUI();
             }
         });
     });
@@ -144,13 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── SIGNATURE PAD ───
     const canvas = document.getElementById('signaturePad');
     let signaturePad = null;
-    
     if (canvas) {
         signaturePad = new SignaturePad(canvas, {
             backgroundColor: 'rgba(255, 255, 255, 0)',
             penColor: 'rgb(10, 31, 58)'
         });
-
         function resizeCanvas() {
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
@@ -158,10 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.getContext("2d").scale(ratio, ratio);
             signaturePad.clear();
         }
-
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
-
         document.getElementById('clearSignature').addEventListener('click', () => {
             signaturePad.clear();
         });
@@ -180,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ─── PDF PROCESSING (pdf-lib) ───
+    // ─── PDF PROCESSING ───
     async function generateSignedPDFs(data) {
         const { PDFDocument, rgb, StandardFonts } = PDFLib;
         const attachments = [];
@@ -192,14 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
             const pages = pdfDoc.getPages();
             const firstPage = pages[0];
-            
             let sigImage = null;
             if (data.signature) {
                 sigImage = await pdfDoc.embedPng(data.signature);
             }
-
             drawLogic(firstPage, font, sigImage, rgb);
-            
             const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
             attachments.push({
                 name: fileName.replace('.pdf', '_Signed.pdf'),
@@ -207,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Mapping Logic
         await processPDF('New-Client-Referral2017.pdf', (page, font, sig, rgb) => {
             const { height } = page.getSize();
             const draw = (text, x, y, size = 10) => {
@@ -262,58 +262,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── FINAL DATA SUBMISSION ───
     const intakeForm = document.getElementById('intakeForm');
-    
-    intakeForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    if (intakeForm) {
+        intakeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        if (signaturePad && signaturePad.isEmpty()) {
-            alert("Please provide a signature to authorize the enrollment.");
-            return;
-        }
-
-        const submitBtn = document.getElementById('submitIntake');
-        const originalBtnText = submitBtn.textContent;
-        submitBtn.textContent = "Processing & Securing Enrollment...";
-        submitBtn.disabled = true;
-
-        try {
-            const formData = new FormData(intakeForm);
-            const data = Object.fromEntries(formData.entries());
-            data.signature = signaturePad.toDataURL();
-
-            let uid;
-            if (auth.currentUser) {
-                uid = auth.currentUser.uid;
-            } else if (data.email && data.password) {
-                const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-                uid = userCredential.user.uid;
-            } else {
-                throw new Error("Please complete the Account Setup (Step 1) before submitting.");
+            if (signaturePad && signaturePad.isEmpty()) {
+                alert("Please provide a signature to authorize the enrollment.");
+                return;
             }
 
-            const signedFiles = await generateSignedPDFs(data);
+            const submitBtn = document.getElementById('submitIntake');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = "Processing & Securing Enrollment...";
+            submitBtn.disabled = true;
 
-            const cleanData = { ...data };
-            delete cleanData.password;
-            delete cleanData.confirmPassword;
-            cleanData.uid = uid;
-            cleanData.submittedAt = serverTimestamp();
-            cleanData.status = "Pending Review";
-            
-            await setDoc(doc(db, "clients", uid), cleanData, { merge: true });
+            try {
+                const formData = new FormData(intakeForm);
+                const data = Object.fromEntries(formData.entries());
+                data.signature = signaturePad.toDataURL();
 
-            // emailjs implementation needs your keys
-            // emailjs.send(...)
+                let uid;
+                if (auth.currentUser) {
+                    uid = auth.currentUser.uid;
+                } else if (data.email && data.password) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+                    uid = userCredential.user.uid;
+                } else {
+                    throw new Error("Please complete the Account Setup (Step 1) before submitting.");
+                }
 
-            alert("Success! Your account has been created and signed forms sent. Redirecting...");
-            window.location.href = '/portal';
+                const signedFiles = await generateSignedPDFs(data);
 
-        } catch (err) {
-            console.error("Enrollment Error:", err);
-            alert("An error occurred: " + err.message);
-            submitBtn.textContent = originalBtnText;
-            submitBtn.disabled = false;
-        }
-    });
+                const cleanData = { ...data };
+                delete cleanData.password;
+                delete cleanData.confirmPassword;
+                cleanData.uid = uid;
+                cleanData.updatedAt = serverTimestamp();
+                cleanData.status = "Pending Review";
+                
+                await setDoc(doc(db, "clients", uid), cleanData, { merge: true });
+
+                // emailjs implementation needs your real keys to work
+                // emailjs.init("YOUR_PUBLIC_KEY");
+                // await emailjs.send("SERVICE_ID", "TEMPLATE_ID", { ... });
+
+                alert("Success! Your profile has been updated and signed forms have been generated. Redirecting to Heritage Connect...");
+                window.location.href = '/portal';
+
+            } catch (err) {
+                console.error("Enrollment Error:", err);
+                alert("An error occurred: " + err.message);
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
 
 });
