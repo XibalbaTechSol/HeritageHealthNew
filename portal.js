@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let cachedUserData = null;
     let googleEvents = [];
+    let selectedMessageId = null;
 
     // ─── AUTHENTICATION GUARD ───
     onAuthStateChanged(auth, async (user) => {
@@ -148,31 +149,228 @@ document.addEventListener('DOMContentLoaded', () => {
         const start = data.submittedAt.toDate();
         const d60 = new Date(start); d60.setDate(d60.getDate() + 60);
         const d90 = new Date(start); d90.setDate(d90.getDate() + 90);
-        document.getElementById('date-60').textContent = d60.toLocaleDateString();
-        document.getElementById('date-90').textContent = d90.toLocaleDateString();
+        const el60 = document.getElementById('date-60');
+        const el90 = document.getElementById('date-90');
+        if (el60) el60.textContent = d60.toLocaleDateString();
+        if (el90) el90.textContent = d90.toLocaleDateString();
+    }
+
+    function initVisitLog(uid) {
+        const table = document.getElementById('visitTableBody');
+        const q = query(collection(db, "visits"), where("clientId", "==", uid), orderBy("date", "desc"));
+        onSnapshot(q, (snap) => {
+            if (snap.empty) { table.innerHTML = '<tr><td colspan="7" class="text-center">No visit records found.</td></tr>'; return; }
+            table.innerHTML = '';
+            snap.forEach(docSnap => {
+                const v = docSnap.data();
+                const tr = document.createElement('tr');
+                const statusClass = v.status === 'Verified' ? 'verified' : 'missed';
+                tr.innerHTML = `
+                    <td>${v.date}</td>
+                    <td>${v.caregiver}</td>
+                    <td>${v.service}</td>
+                    <td>${v.checkIn || '--'}</td>
+                    <td>${v.checkOut || '--'}</td>
+                    <td>${v.hours || '0'}</td>
+                    <td><span class="status-badge ${statusClass}">${v.status}</span></td>
+                `;
+                table.appendChild(tr);
+            });
+        });
+    }
+
+    function initActivityLogs(uid) {
+        const feed = document.getElementById('realActivityFeed');
+        const q = query(collection(db, "activity"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(8));
+        onSnapshot(q, (snap) => {
+            if (snap.empty) { feed.innerHTML = '<p>No activity yet.</p>'; return; }
+            feed.innerHTML = '';
+            snap.forEach(docSnap => {
+                const a = docSnap.data();
+                const div = document.createElement('div');
+                div.className = 'activity-item';
+                div.innerHTML = `
+                    <div class="activity-dot" style="background: ${a.color || '#C9A84C'}"></div>
+                    <div class="activity-content">
+                        <p><strong>${a.title}</strong></p>
+                        <span>${a.body}</span>
+                        <time>${a.timestamp?.toDate().toLocaleString() || 'Just now'}</time>
+                    </div>
+                `;
+                feed.appendChild(div);
+            });
+        });
+    }
+
+    function initNotifications(uid) {
+        const list = document.getElementById('notifList');
+        const dot = document.getElementById('notifDot');
+        const q = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(10));
+        onSnapshot(q, (snap) => {
+            let unread = 0;
+            if (snap.empty) { list.innerHTML = '<p>No notifications.</p>'; dot.style.display = 'none'; return; }
+            list.innerHTML = '';
+            snap.forEach(docSnap => {
+                const n = docSnap.data();
+                if (!n.read) unread++;
+                const div = document.createElement('div');
+                div.className = `notif-item ${n.read ? '' : 'unread'}`;
+                div.innerHTML = `<h5>${n.title}</h5><p>${n.body}</p>`;
+                list.appendChild(div);
+            });
+            dot.style.display = unread > 0 ? 'block' : 'none';
+        });
+        document.getElementById('notifBell')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('notifDropdown').classList.toggle('active');
+        });
+    }
+
+    function initMessaging(uid) {
+        const msgList = document.getElementById('realMessageList');
+        const q = query(collection(db, "messages"), where("clientId", "==", uid), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snap) => {
+            if (snap.empty) { msgList.innerHTML = '<p>No messages.</p>'; return; }
+            msgList.innerHTML = '';
+            snap.forEach(docSnap => {
+                const m = docSnap.data();
+                const div = document.createElement('div');
+                div.className = `message-item ${m.read ? '' : 'unread'}`;
+                div.innerHTML = `
+                    <div class="msg-avatar">${m.senderInitials || 'HH'}</div>
+                    <div class="msg-content">
+                        <div class="msg-header"><strong>${m.senderName}</strong></div>
+                        <h4>${m.subject}</h4>
+                        <p>${m.body}</p>
+                    </div>
+                `;
+                div.onclick = () => showConversation(docSnap.id, m);
+                msgList.appendChild(div);
+            });
+        });
+    }
+
+    function showConversation(id, m) {
+        const area = document.getElementById('messageViewArea');
+        selectedMessageId = id;
+        area.innerHTML = `
+            <div class="conversation-header"><h4>${m.subject}</h4></div>
+            <div class="conversation-body" id="chatBody">
+                <div class="chat-bubble received">${m.body}</div>
+            </div>
+            <div class="conversation-footer">
+                <form id="replyForm" class="reply-box">
+                    <input type="text" class="form-input-custom" placeholder="Type reply..." required>
+                    <button type="submit" class="btn-primary-custom">Send</button>
+                </form>
+            </div>
+        `;
+        document.getElementById('replyForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const text = e.target.querySelector('input').value;
+            await addDoc(collection(db, "messages"), {
+                clientId: auth.currentUser.uid,
+                subject: `Re: ${m.subject}`,
+                body: text,
+                senderName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
+                senderRole: "Client",
+                timestamp: serverTimestamp(),
+                read: true
+            });
+            e.target.reset();
+        };
     }
 
     // ─── ACTION HANDLERS ───
-    document.getElementById('openEditProfile')?.addEventListener('click', () => toggleModal('editProfileModal', true));
+    document.getElementById('openEditProfile')?.addEventListener('click', () => {
+        if (!cachedUserData) return;
+        const form = document.getElementById('editProfileForm');
+        Object.keys(cachedUserData).forEach(key => {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) input.value = cachedUserData[key];
+        });
+        toggleModal('editProfileModal', true);
+    });
+    
     document.getElementById('closeEditProfile')?.addEventListener('click', () => toggleModal('editProfileModal', false));
+    document.getElementById('cancelEditProfile')?.addEventListener('click', () => toggleModal('editProfileModal', false));
+    
     document.getElementById('editProfileForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const updates = Object.fromEntries(new FormData(e.target).entries());
-        await setDoc(doc(db, "clients", auth.currentUser.uid), updates, { merge: true });
-        toggleModal('editProfileModal', false);
+        try {
+            await setDoc(doc(db, "clients", auth.currentUser.uid), updates, { merge: true });
+            toggleModal('editProfileModal', false);
+        } catch (e) { alert(e.message); }
     });
 
     document.getElementById('openMessageComposer')?.addEventListener('click', () => toggleModal('messageModal', true));
     document.getElementById('closeMessageComposer')?.addEventListener('click', () => toggleModal('messageModal', false));
+    document.getElementById('cancelMessage')?.addEventListener('click', () => toggleModal('messageModal', false));
+    
     document.getElementById('messageForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target).entries());
-        await addDoc(collection(db, "messages"), { ...data, clientId: auth.currentUser.uid, timestamp: serverTimestamp(), senderRole: "Client" });
+        await addDoc(collection(db, "messages"), {
+            ...data,
+            clientId: auth.currentUser.uid,
+            senderName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
+            senderRole: "Client",
+            timestamp: serverTimestamp(),
+            read: true
+        });
         toggleModal('messageModal', false);
+        e.target.reset();
     });
 
     document.getElementById('openNurseScheduler')?.addEventListener('click', () => toggleModal('nurseSchedulerModal', true));
     document.getElementById('closeNurseScheduler')?.addEventListener('click', () => toggleModal('nurseSchedulerModal', false));
+    document.getElementById('cancelNurseScheduler')?.addEventListener('click', () => toggleModal('nurseSchedulerModal', false));
+    
+    document.getElementById('nurseSchedulerForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        await addDoc(collection(db, "nurse_visits"), {
+            ...data,
+            clientId: auth.currentUser.uid,
+            timestamp: serverTimestamp(),
+            status: "Pending"
+        });
+        toggleModal('nurseSchedulerModal', false);
+        alert("Visit requested.");
+    });
+
+    async function downloadPacket(btn) {
+        if (!cachedUserData || !cachedUserData.signature) return alert("No enrollment data found.");
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+        try {
+            const files = await generateClientPacket(cachedUserData);
+            if (files && files.length > 0) {
+                const file = files[0];
+                const blob = new Blob([file.bytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.getElementById('pdfDownloadLink');
+                link.href = url; link.download = file.name; link.click();
+                URL.revokeObjectURL(url);
+            }
+        } catch (e) { alert("Error generating PDF."); }
+        finally { btn.innerHTML = original; }
+    }
+
+    document.getElementById('viewSignedPacket')?.addEventListener('click', (e) => downloadPacket(e.currentTarget));
+    document.getElementById('viewSignedPacketDashboard')?.addEventListener('click', (e) => downloadPacket(e.currentTarget));
+
+    // Dashboard Quick Actions
+    document.getElementById('quick-action-message')?.addEventListener('click', () => {
+        navigateTo('messages');
+        toggleModal('messageModal', true);
+    });
+    document.getElementById('quick-action-download')?.addEventListener('click', () => navigateTo('documents'));
+    document.getElementById('quick-action-schedule')?.addEventListener('click', () => {
+        navigateTo('schedule');
+        toggleModal('nurseSchedulerModal', true);
+    });
 
     // ─── NAVIGATION ───
     const sidebarLinks = document.querySelectorAll('.sidebar-link[data-page]');
@@ -183,8 +381,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`page-${pageId}`)?.classList.add('active');
         document.querySelector(`.sidebar-link[data-page="${pageId}"]`)?.classList.add('active');
         document.getElementById('sidebar').classList.remove('open');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     sidebarLinks.forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(link.dataset.page); }));
+    document.querySelectorAll('[data-goto]').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(link.dataset.goto); }));
     document.querySelector('.sidebar-logout')?.addEventListener('click', async (e) => {
         e.preventDefault();
         await signOut(auth);
@@ -192,6 +392,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('mobileMenuBtn')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
-    // STUBS FOR REMAINING
-    function initMessaging(u){} function initNotifications(u){} function initActivityLogs(u){} function initVisitLog(u){}
 });

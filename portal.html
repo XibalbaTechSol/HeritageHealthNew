@@ -125,11 +125,6 @@
                 </div>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <!-- ... stats ... -->
-            </div>
-
             <!-- Quick Actions -->
             <div class="quick-actions-row" style="margin-bottom: 36px;">
                 <div class="card" style="padding: 24px 32px; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; border-left: 5px solid var(--gold); background: var(--white); box-shadow: var(--shadow-md);">
@@ -157,7 +152,6 @@
                         <a href="#" class="card-link" data-goto="schedule">View All</a>
                     </div>
                     <div class="card-body" id="realTodaySchedule">
-                        <!-- Populated by JS -->
                         <div class="text-center" style="padding: 20px; color: var(--text-muted);">Loading today's visits...</div>
                     </div>
                 </div>
@@ -169,7 +163,6 @@
                     </div>
                     <div class="card-body">
                         <div class="activity-feed" id="realActivityFeed">
-                            <!-- Populated by JS -->
                             <div class="text-center" style="padding: 20px; color: var(--text-muted);">Loading activity...</div>
                         </div>
                     </div>
@@ -181,7 +174,6 @@
                         <h3>Your Care Team</h3>
                     </div>
                     <div class="card-body" id="realCareTeamList">
-                        <!-- Populated by JS -->
                         <div class="text-center" style="padding: 20px; color: var(--text-muted);">Loading team...</div>
                     </div>
                 </div>
@@ -193,19 +185,19 @@
                     </div>
                     <div class="card-body">
                         <div class="quick-actions">
-                            <button class="quick-action-btn" onclick="alert('Opening message composer...')">
+                            <button class="quick-action-btn" id="quick-action-message">
                                 <i class="fa-solid fa-paper-plane"></i>
                                 <span>Message Care Team</span>
                             </button>
-                            <button class="quick-action-btn" onclick="alert('Downloading report...')">
+                            <button class="quick-action-btn" id="quick-action-download">
                                 <i class="fa-solid fa-download"></i>
                                 <span>Download Reports</span>
                             </button>
-                            <button class="quick-action-btn" onclick="alert('Opening schedule request...')">
+                            <button class="quick-action-btn" id="quick-action-schedule">
                                 <i class="fa-solid fa-calendar-plus"></i>
                                 <span>Request Schedule Change</span>
                             </button>
-                            <button class="quick-action-btn" onclick="alert('Calling Heritage Health: (262) 554-8800')">
+                            <button class="quick-action-btn" onclick="window.location.href='tel:2625548800'">
                                 <i class="fa-solid fa-phone"></i>
                                 <span>Call Office</span>
                             </button>
@@ -229,7 +221,7 @@
                         <option>This Month</option>
                         <option>Last 30 Days</option>
                     </select>
-                    <button class="btn-portal-outline" onclick="alert('Exporting visit log as PDF...')">
+                    <button class="btn-portal-outline" id="exportVisitLog">
                         <i class="fa-solid fa-download"></i> Export
                     </button>
                 </div>
@@ -267,7 +259,6 @@
             </div>
 
             <div class="careplan-grid" id="dynamicCarePlanGrid">
-                <!-- Populated by JS -->
                 <div class="text-center" style="grid-column: 1/-1; padding: 50px; color: var(--text-muted);">
                     <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
                     <p>Fetching your latest plan of care...</p>
@@ -322,51 +313,6 @@
                     <!-- Populated by JS -->
                 </div>
             </div>
-
-            <div class="card" style="margin-top: 28px;">
-                <div class="card-header">
-                    <h3>Weekly Recurring Schedule</h3>
-                </div>
-                <div class="card-body">
-                    <div class="weekly-schedule">
-                        <div class="week-day">
-                            <h5>Monday — Friday</h5>
-                            <div class="week-slots">
-                                <div class="week-slot">
-                                    <span class="slot-time">8:00 AM — 10:00 AM</span>
-                                    <span class="slot-service">Morning Routine</span>
-                                    <span class="slot-cg">Sarah M.</span>
-                                </div>
-                                <div class="week-slot">
-                                    <span class="slot-time">12:30 PM — 2:00 PM</span>
-                                    <span class="slot-service">Midday Care</span>
-                                    <span class="slot-cg">Sarah M.</span>
-                                </div>
-                                <div class="week-slot">
-                                    <span class="slot-time">6:00 PM — 8:00 PM</span>
-                                    <span class="slot-service">Evening Routine</span>
-                                    <span class="slot-cg">Sarah M.</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="week-day">
-                            <h5>Saturday — Sunday</h5>
-                            <div class="week-slots">
-                                <div class="week-slot">
-                                    <span class="slot-time">9:00 AM — 11:00 AM</span>
-                                    <span class="slot-service">Morning Routine</span>
-                                    <span class="slot-cg">Sarah M.</span>
-                                </div>
-                                <div class="week-slot">
-                                    <span class="slot-time">5:00 PM — 7:00 PM</span>
-                                    <span class="slot-service">Evening Routine</span>
-                                    <span class="slot-cg">Sarah M.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- ═══════════ DOCUMENTS PAGE ═══════════ -->
@@ -379,7 +325,6 @@
             </div>
 
             <div class="docs-grid" id="signedDocsGrid">
-                <!-- This will be dynamically populated or adjusted -->
                 <div class="card doc-card" id="doc-enrollment">
                     <div class="doc-icon"><i class="fa-solid fa-file-signature"></i></div>
                     <div class="doc-info">
@@ -401,7 +346,6 @@
                 </div>
             </div>
             
-            <!-- Hidden anchor for downloading -->
             <a id="pdfDownloadLink" style="display:none"></a>
         </div>
 
@@ -420,7 +364,77 @@
             </div>
 
             <div class="profile-grid">
-                <!-- ... existing cards ... -->
+                <div class="card">
+                    <div class="card-header"><h3>Personal Information</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Full Name</label>
+                            <span id="prof-fullName">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Member ID / UID</label>
+                            <span id="prof-uid">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Date of Birth</label>
+                            <span id="prof-dob">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Phone</label>
+                            <span id="prof-phone">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Address</label>
+                            <span id="prof-address">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Clinical Details</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Medicaid Number</label>
+                            <span id="prof-medicaid">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Primary Language</label>
+                            <span id="prof-language">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Gender</label>
+                            <span id="prof-gender">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Primary Care Physician</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Physician</label>
+                            <span id="prof-doctor">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Clinic Location</label>
+                            <span id="prof-docLoc">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3>Caregiver Preference</h3></div>
+                    <div class="card-body">
+                        <div class="profile-field">
+                            <label>Chosen PCW</label>
+                            <span id="prof-pcw">Loading...</span>
+                        </div>
+                        <div class="profile-field">
+                            <label>Enrollment Status</label>
+                            <span id="prof-status">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -501,7 +515,42 @@
 
     <!-- Nurse Visit Scheduler Modal -->
     <div id="nurseSchedulerModal" class="modal-overlay-custom">
-        <!-- ... scheduler content ... -->
+        <div class="modal-container-custom" style="max-width: 500px;">
+            <div class="modal-header-custom">
+                <h3>Schedule Nursing Visit</h3>
+                <button class="close-modal-custom" id="closeNurseScheduler">&times;</button>
+            </div>
+            <form id="nurseSchedulerForm" class="modal-body-custom">
+                <div class="form-group">
+                    <label>Visit Type</label>
+                    <select name="visitType" class="form-input-custom" required>
+                        <option value="60-day">60-Day Recertification</option>
+                        <option value="90-day">90-Day Clinical Assessment</option>
+                        <option value="supervisory">Nurse Supervisory Visit</option>
+                        <option value="change-of-condition">Change of Condition Review</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Date</label>
+                    <input type="date" name="preferredDate" class="form-input-custom" required>
+                </div>
+                <div class="form-group">
+                    <label>Time Preference</label>
+                    <select name="preferredTime" class="form-input-custom">
+                        <option value="morning">Morning (8 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Special Instructions</label>
+                    <textarea name="notes" class="form-input-custom" style="height: 80px;" placeholder="Any specific clinical concerns..."></textarea>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="btn-outline-custom" id="cancelNurseScheduler">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Request Visit</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Message Composer Modal -->
@@ -535,8 +584,6 @@
             </form>
         </div>
     </div>
-
-    </main>
 
     <script type="module" src="portal.js"></script>
 </body>
