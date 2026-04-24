@@ -1,64 +1,140 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ─── UTILS ───
-    function safeAddListener(id, event, callback) {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener(event, callback);
+    // ─── Hero loaded animation ───
+    const hero = document.querySelector('.hero');
+    if (hero) {
+        requestAnimationFrame(() => hero.classList.add('loaded'));
     }
 
-    // ─── Environment Detection ───
-    const isLocal = window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1' || 
-                    window.location.protocol === 'file:';
+    // ─── Header scroll behavior ───
+    const header = document.getElementById('siteHeader');
+    let lastScroll = 0;
 
-    // ─── Mobile Menu Toggle ───
-    const mobileToggle = document.getElementById('mobileToggle');
-    const navList = document.querySelector('.nav-list');
-    if (mobileToggle && navList) {
-        mobileToggle.addEventListener('click', () => {
-            navList.classList.toggle('active');
-            mobileToggle.classList.toggle('active');
+    function onScroll() {
+        const y = window.scrollY;
+        if (header) {
+            if (y > 60) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+        lastScroll = y;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // run once on load
+
+    // ─── Mobile Navigation ───
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navMenu');
+    const navClose = document.getElementById('navClose');
+
+    if (navToggle) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
         });
     }
 
-    // ─── Header Scroll Logic ───
-    const header = document.querySelector('.site-header');
-    if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) header.classList.add('scrolled');
-            else header.classList.remove('scrolled');
-        }, { passive: true });
+    function closeMenu() {
+        navMenu.classList.remove('active');
+        document.body.style.overflow = '';
     }
-// ─── Reveal on Scroll ───
-const revealElements = document.querySelectorAll('.reveal');
-if (revealElements.length > 0) {
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
+
+    if (navClose) {
+        navClose.addEventListener('click', closeMenu);
+    }
+
+    // Close on nav link click
+    document.querySelectorAll('.nav-link, .nav-cta').forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
+
+    // ─── Active nav link on scroll ───
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function updateActiveNav() {
+        const scrollPos = window.scrollY + 120;
+        sections.forEach(section => {
+            const top = section.offsetTop;
+            const bottom = top + section.offsetHeight;
+            const id = section.getAttribute('id');
+            if (scrollPos >= top && scrollPos < bottom) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${id}`) {
+                        link.classList.add('active');
+                    }
+                });
             }
         });
-    }, { threshold: 0.1 });
-    revealElements.forEach(el => revealObserver.observe(el));
-}
-    // ─── Smooth Scroll ───
+    }
+
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+
+    // ─── Smooth scroll for all anchor links ───
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
             e.preventDefault();
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            const target = document.querySelector(targetId);
+            const target = document.querySelector(href);
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                if (navList && navList.classList.contains('active')) {
-                    navList.classList.remove('active');
-                    mobileToggle.classList.remove('active');
-                }
+                const offset = 80;
+                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top, behavior: 'smooth' });
             }
         });
     });
 
-    // ─── Portal Form Simulation ───
+    // ─── Reveal on scroll (Intersection Observer) ───
+    const revealElements = document.querySelectorAll('.reveal');
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ─── Form submissions ───
+    const forms = {
+        assessmentForm: 'Thank you! Your assessment request has been submitted. A Heritage Health care coordinator will contact you shortly.',
+        contactForm: 'Message sent! We typically respond within one business day.'
+    };
+
+    Object.entries(forms).forEach(([id, message]) => {
+        const form = document.getElementById(id);
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btn = form.querySelector('button[type="submit"]');
+                const original = btn.textContent;
+                btn.textContent = '✓ Submitted';
+                btn.style.opacity = '0.7';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    alert(message);
+                    btn.textContent = original;
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                    form.reset();
+                }, 400);
+            });
+        }
+    });
+
+    // Portal form → redirect to portal
     const portalForm = document.getElementById('portalForm');
     if (portalForm) {
         portalForm.addEventListener('submit', (e) => {
@@ -67,34 +143,76 @@ if (revealElements.length > 0) {
             btn.textContent = 'Signing In...';
             btn.style.opacity = '0.7';
             btn.disabled = true;
-            setTimeout(() => { window.location.href = 'portal.html'; }, 800);
+            setTimeout(() => {
+                window.location.href = 'portal.html';
+            }, 800);
         });
     }
 
     // ─── Chatbot ───
     const chatBubble = document.getElementById('chatBubble');
     const chatWindow = document.getElementById('chatWindow');
+    const closeChat = document.getElementById('closeChat');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
-    const SYSTEM_PROMPT = "You are the Heritage Health Services clinical support AI. Be professional, compassionate, and informative. You are a Registered Nurse. Refer to (262) 554-8800 for assessments.";
-
-    if (chatBubble && chatWindow) {
+    if (chatBubble) {
         chatBubble.addEventListener('click', () => {
             chatWindow.classList.toggle('active');
-            if (chatWindow.classList.contains('active') && chatInput) {
-                setTimeout(() => chatInput.focus(), 100);
+            if (chatWindow.classList.contains('active')) {
+                chatInput.focus();
             }
         });
     }
 
-    safeAddListener('closeChat', 'click', () => {
-        if (chatWindow) chatWindow.classList.remove('active');
-    });
+    if (closeChat) {
+        closeChat.addEventListener('click', () => {
+            chatWindow.classList.remove('active');
+        });
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            appendMessage('user', message);
+            chatInput.value = '';
+
+            // Typing indicator
+            const typing = document.createElement('div');
+            typing.className = 'message bot';
+            typing.innerHTML = '<em style="opacity:0.5;">typing...</em>';
+            chatMessages.appendChild(typing);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            setTimeout(() => {
+                chatMessages.removeChild(typing);
+                const lower = message.toLowerCase();
+                let response;
+
+                if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
+                    response = "Through our 'Get Paid to Care' program, family members and friends can often be compensated for providing care! Individuals who receive Title 19 or Medicaid have the right to choose their own personal care aid. Would you like to learn more about enrollment?";
+                } else if (lower.includes('assessment') || lower.includes('new') || lower.includes('start') || lower.includes('enroll')) {
+                    response = "We offer free in-home Registered Nurse assessments across all of Southeast Wisconsin. You can download the New Client Form, Medical Release, and Wheaton Release in our 'New Clients' section, or I can help you schedule one directly.";
+                } else if (lower.includes('service') || lower.includes('help') || lower.includes('care')) {
+                    response = "We offer a full range of personal care services including morning & evening routines, transfer assistance, dressing help, personal hygiene, incontinence care, and bathing & showering assistance. All with a Registered Nurse-led support team. Would you like details on any specific service?";
+                } else if (lower.includes('contact') || lower.includes('phone') || lower.includes('address') || lower.includes('office')) {
+                    response = "You can reach us at (262) 554-8800, email Info@wihhs.com, or visit us at 5331 Spring St. Suite 101, Mt. Pleasant, WI 53406. Our office hours are Monday – Friday, 10am to 4pm.";
+                } else if (lower.includes('county') || lower.includes('area') || lower.includes('where') || lower.includes('location')) {
+                    response = "We proudly serve Milwaukee, Racine, Kenosha, Dane, Dodge, Jefferson, Ozaukee, Rock, Walworth, Washington, and Waukesha Counties in Wisconsin.";
+                } else {
+                    response = "Thank you for your inquiry. A Heritage Health care coordinator would be happy to discuss that with you. You can call us at (262) 554-8800 or would you like me to help you schedule a free home assessment?";
+                }
+
+                appendMessage('bot', response);
+            }, 900);
+        });
+    }
 
     function appendMessage(sender, text) {
-        if (!chatMessages) return;
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${sender}`;
         msgDiv.textContent = text;
@@ -102,82 +220,26 @@ if (revealElements.length > 0) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // --- REAL AI ENGINE (Used for Local Development) ---
-    async function callGemini(msg) {
-        let key = sessionStorage.getItem('HHS_CHAT_KEY');
-        if (!key) {
-            key = prompt("Real AI Engine Detected (Local Only). Please enter your Gemini API Key:");
-            if (key) sessionStorage.setItem('HHS_CHAT_KEY', key);
-            else return null;
-        }
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-        try {
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${msg}` }] }] })
-            });
-            const data = await resp.json();
-            return data.candidates[0].content.parts[0].text;
-        } catch (e) {
-            console.error("AI Error:", e);
-            return null;
-        }
-    }
-
-    // --- FALLBACK ENGINE (Used for GitHub Pages / Public) ---
-    function getClinicalResponse(msg) {
-        const lower = msg.toLowerCase();
-        if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
-            return "As an RN, I can confirm that Wisconsin Medicaid offers a path for family members to be compensated for providing essential care. To begin, we establish 'Medical Necessity' through a physician’s order and a professional nursing assessment. Would you like to schedule a free RN consultation?";
-        }
-        if (lower.includes('assessment') || lower.includes('start') || lower.includes('enroll')) {
-            return "Our enrollment process starts with a free in-home nursing assessment. We evaluate Activities of Daily Living (ADLs) to create a personalized Plan of Care. You can call our clinical team at (262) 554-8800 to set this up.";
-        }
-        if (lower.includes('hmo') || lower.includes('title 19') || lower.includes('insurance')) {
-            return "We work with both Straight Title 19 and most major Medicaid HMOs like iCare. Our intake team acts as your administrative advocate to navigate these specific insurance requirements.";
-        }
-        return "Thank you for reaching out. As clinical needs are unique, I recommend speaking with one of our Heritage Health care coordinators at (262) 554-8800 for specific guidance tailored to your loved one’s condition.";
-    }
-
-    if (chatForm) {
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msg = chatInput.value.trim();
-            if (!msg) return;
-
-            appendMessage('user', msg);
-            chatInput.value = '';
-
-            const typing = document.createElement('div');
-            typing.className = 'message bot';
-            typing.innerHTML = '<em>Nurse Rachel is typing...</em>';
-            chatMessages.appendChild(typing);
-
-            if (isLocal) {
-                // Try Gemini AI if running locally
-                const aiResp = await callGemini(msg);
-                if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
-                if (aiResp) appendMessage('bot', aiResp);
-                else appendMessage('bot', getClinicalResponse(msg)); // Fallback if AI fails
-            } else {
-                // Use Fallback instantly on GitHub Pages
-                setTimeout(() => {
-                    if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
-                    appendMessage('bot', getClinicalResponse(msg));
-                }, 800);
+    // ─── Parallax effect on hero background ───
+    const heroBg = document.querySelector('.hero-bg-container');
+    if (heroBg) {
+        window.addEventListener('scroll', () => {
+            const y = window.scrollY;
+            if (y < window.innerHeight) {
+                heroBg.style.transform = `scale(1.05) translateY(${y * 0.15}px)`;
             }
-        });
+        }, { passive: true });
     }
 
-    // ─── Hero Background ───
+    // ─── Hero Background Carousel ───
     const slides = document.querySelectorAll('.hero-bg-slide');
-    if (slides.length > 0) {
-        let cur = 0;
+    if (slides.length > 1) {
+        let currentSlide = 0;
         setInterval(() => {
-            slides[cur].classList.remove('active');
-            cur = (cur + 1) % slides.length;
-            slides[cur].classList.add('active');
-        }, 5000);
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 10000); // 10 seconds
     }
+
 });

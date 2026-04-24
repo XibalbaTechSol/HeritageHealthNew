@@ -1791,13 +1791,12 @@ h4, h5, h6 {
    ═══════════════════════════════════════════════════ */
 
 .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 0.9s var(--ease-out);
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.9s var(--ease-out);
 }
 
-.reveal.visible,
-.reveal.active {
+.reveal.visible {
     opacity: 1;
     transform: translateY(0);
 }
