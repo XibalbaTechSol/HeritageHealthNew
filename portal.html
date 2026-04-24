@@ -115,45 +115,24 @@
 
             <!-- Stats Grid -->
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(52, 211, 153, 0.1); color: #10B981;">
-                        <i class="fa-solid fa-check-circle"></i>
+                <!-- ... stats ... -->
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions-row" style="margin-bottom: 36px;">
+                <div class="card" style="padding: 24px 32px; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; border-left: 5px solid var(--gold); background: var(--white); box-shadow: var(--shadow-md);">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="width: 50px; height: 50px; background: var(--gold-muted); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1.4rem;">
+                            <i class="fa-solid fa-file-contract"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 4px; font-size: 1.1rem; color: var(--navy); font-family: 'Playfair Display', serif;">Your Signed Enrollment Packet</h4>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Instantly view or download your complete clinical authorization and referral documentation.</p>
+                        </div>
                     </div>
-                    <div class="stat-info">
-                        <span class="stat-value">142</span>
-                        <span class="stat-label">Visits Completed</span>
-                    </div>
-                    <span class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> 12%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6;">
-                        <i class="fa-solid fa-clock"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">426</span>
-                        <span class="stat-label">Total Care Hours</span>
-                    </div>
-                    <span class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> 8%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(201, 168, 76, 0.1); color: #C9A84C;">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">4.9</span>
-                        <span class="stat-label">Care Rating</span>
-                    </div>
-                    <span class="stat-trend neutral">Excellent</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8B5CF6;">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">3</span>
-                        <span class="stat-label">Upcoming Visits</span>
-                    </div>
-                    <span class="stat-trend neutral">This Week</span>
+                    <button class="btn btn-primary" id="viewSignedPacketDashboard" style="padding: 12px 28px; font-weight: 600; letter-spacing: 0.02em;">
+                        <i class="fa-solid fa-download" style="margin-right: 10px;"></i> View Documents
+                    </button>
                 </div>
             </div>
 

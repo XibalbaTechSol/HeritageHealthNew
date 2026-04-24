@@ -54,43 +54,50 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ─── DYNAMIC DOCUMENT VIEWING ───
+    async function downloadPacket(btn) {
+        if (!cachedUserData || !cachedUserData.signature) {
+            alert("Loading your enrollment data. Please wait a moment and try again.");
+            return;
+        }
+
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+        btn.disabled = true;
+
+        try {
+            // Generate PDFs on the fly using stored Firestore data
+            const files = await generateClientPacket(cachedUserData);
+            
+            if (files && files.length > 0) {
+                // For this download, we trigger the first file (Combined Referral)
+                const file = files[0];
+                const blob = new Blob([file.bytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.getElementById('pdfDownloadLink');
+                if (link) {
+                    link.href = url;
+                    link.download = file.name;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                }
+            }
+        } catch (err) {
+            console.error("PDF View Error:", err);
+            alert("Error generating your documents. Please contact support.");
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    }
+
     const viewSignedBtn = document.getElementById('viewSignedPacket');
     if (viewSignedBtn) {
-        viewSignedBtn.addEventListener('click', async () => {
-            if (!cachedUserData || !cachedUserData.signature) {
-                alert("Loading your enrollment data. Please wait a moment and try again.");
-                return;
-            }
+        viewSignedBtn.addEventListener('click', () => downloadPacket(viewSignedBtn));
+    }
 
-            const originalHTML = viewSignedBtn.innerHTML;
-            viewSignedBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            viewSignedBtn.disabled = true;
-
-            try {
-                // Generate PDFs on the fly using stored Firestore data
-                const files = await generateClientPacket(cachedUserData);
-                
-                // For this download, we trigger the first file (Combined Referral)
-                if (files && files.length > 0) {
-                    const file = files[0];
-                    const blob = new Blob([file.bytes], { type: 'application/pdf' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.getElementById('pdfDownloadLink');
-                    if (link) {
-                        link.href = url;
-                        link.download = file.name;
-                        link.click();
-                        URL.revokeObjectURL(url);
-                    }
-                }
-            } catch (err) {
-                console.error("PDF View Error:", err);
-                alert("Error generating your documents. Please contact support.");
-            } finally {
-                viewSignedBtn.innerHTML = originalHTML;
-                viewSignedBtn.disabled = false;
-            }
-        });
+    const viewSignedDashBtn = document.getElementById('viewSignedPacketDashboard');
+    if (viewSignedDashBtn) {
+        viewSignedDashBtn.addEventListener('click', () => downloadPacket(viewSignedDashBtn));
     }
 
     function updateUIWithUserData(data) {

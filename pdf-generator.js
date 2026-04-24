@@ -37,28 +37,39 @@ export async function generateClientPacket(data) {
         });
     }
 
-    // 1. Referral Form
-    await processPDF('New-Client-Referral2017.pdf', (page, font, sig, rgb) => {
-        const { height } = page.getSize();
-        const draw = (text, x, y, size = 10) => {
-            if (text) page.drawText(String(text), { x, y: height - y, size, font });
-        };
-        
-        draw(new Date(data.submittedAt?.seconds * 1000 || Date.now()).toLocaleDateString(), 550, 195);
-        draw(`${data.lastName}, ${data.firstName}`, 100, 255);
-        draw(data.ssn, 70, 272);
-        draw(data.pcwPhone, 450, 272);
-        draw(data.dob, 70, 305);
-        draw(data.language, 420, 305);
-        draw(data.gender, 760, 305);
-        draw(data.address, 130, 345);
-        draw(data.city, 400, 345);
-        draw(data.zip, 720, 345);
-        draw(data.medicaidNumber, 150, 395);
-        draw(data.doctorName, 170, 415);
-        draw(data.doctorLocation, 600, 415);
-        draw(data.pcwName, 200, 855);
-    });
+        // 1. Referral Form
+        await processPDF('New-Client-Referral2017.pdf', (page, font, sig, rgb) => {
+            const { height } = page.getSize();
+            const draw = (text, x, y, size = 10) => {
+                if (text) page.drawText(String(text), { x, y: height - y, size, font });
+            };
+            
+            draw(new Date(data.submittedAt?.seconds * 1000 || Date.now()).toLocaleDateString(), 550, 195);
+            draw(`${data.lastName}, ${data.firstName}`, 100, 255);
+            draw(data.ssn, 70, 272);
+            draw(data.pcwPhone, 450, 272);
+            draw(data.dob, 70, 305);
+            draw(data.language, 420, 305);
+            draw(data.gender, 760, 305);
+            draw(data.address, 130, 345);
+            draw(data.city, 400, 345);
+            draw(data.zip, 720, 345);
+            draw(data.medicaidNumber, 150, 395);
+            draw(data.doctorName, 170, 415);
+            draw(data.doctorLocation, 600, 415);
+            
+            // Additional Information (MAPP data)
+            let additionalInfo = [];
+            if (data.prevAgency === 'yes') additionalInfo.push(`Previous Agency: ${data.agencyName}`);
+            if (data.mappParticipant === 'yes') additionalInfo.push("MAPP Participant: Yes");
+            if (data.employmentStatus) additionalInfo.push(`Employment: ${data.employmentStatus}`);
+            
+            draw(additionalInfo.join(" | "), 70, 755); // Placing in the first 'Additional Information' line
+            
+            draw(data.pcwName, 200, 855);
+            draw(data.pcwPhone, 200, 875);
+            draw(data.referralSource, 400, 895);
+        });
 
     // 2. Medical Release
     await processPDF('Medical-Release2017.pdf', (page, font, sig, rgb) => {
