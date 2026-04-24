@@ -553,8 +553,8 @@
         <div class="page" id="page-messages">
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Messages</h1>
-                    <p class="page-subtitle">Secure communication with your care team</p>
+                    <h1 class="page-title">Secure Messages</h1>
+                    <p class="page-subtitle">Direct communication with your supervising nurse and coordinator.</p>
                 </div>
                 <div class="page-actions">
                     <button class="btn-portal" id="openMessageComposer">
@@ -563,12 +563,16 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="message-list" id="realMessageList">
-                    <!-- Populated by JS -->
-                    <div class="text-center" style="padding: 40px; color: var(--text-muted);">
-                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
-                        <p>Loading your secure messages...</p>
+            <div class="messaging-layout">
+                <div class="card message-list-card">
+                    <div class="message-list" id="realMessageList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <div class="card message-view-card" id="messageViewArea">
+                    <div class="message-view-empty">
+                        <i class="fa-solid fa-comments"></i>
+                        <p>Select a message to view the conversation</p>
                     </div>
                 </div>
             </div>
