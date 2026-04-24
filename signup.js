@@ -10,6 +10,7 @@ import {
     getAuth, 
     createUserWithEmailAndPassword, 
     GoogleAuthProvider, 
+    signInWithPopup,
     signInWithRedirect,
     getRedirectResult,
     onAuthStateChanged
@@ -44,43 +45,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// ─── AUTH STATE & REDIRECT HANDLING ───
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        console.log("User detected:", user.email);
-        
-        // Pre-fill email in the form
-        const emailInput = document.querySelector('input[name="email"]');
-        if (emailInput) emailInput.value = user.email;
-
-        // Auto-create client profile if it doesn't exist
-        const clientDoc = await getDoc(doc(db, "clients", user.uid));
-        if (!clientDoc.exists()) {
-            console.log("New Google/Email User: Creating initial profile entry...");
-            await setDoc(doc(db, "clients", user.uid), {
-                uid: user.uid,
-                email: user.email,
-                status: "Registration In-Progress",
-                createdAt: serverTimestamp()
-            }, { merge: true });
-        }
-
-        // If we are at Step 1 (Account Setup), move to Step 2 automatically
-        // This handles both returning from redirect AND immediate local login
-        if (window.currentIntakeStep === 1) {
-            window.currentIntakeStep = 2;
-            if (typeof window.updateWizardUI === 'function') window.updateWizardUI();
-        }
-    }
-});
-
-// Handle the explicit redirect result from Google
-getRedirectResult(auth).catch((error) => {
-    if (error.code !== 'auth/callback-internal-error') {
-        console.error("Auth Redirect Error:", error.code, error.message);
-    }
-});
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // ─── WIZARD STATE ───
@@ -108,14 +72,66 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ─── AUTH STATE HANDLING ───
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            console.log("Auth State Changed: User detected", user.email);
+            
+            // Pre-fill email in the form
+            const emailInput = document.querySelector('input[name="email"]');
+            if (emailInput) emailInput.value = user.email;
+
+            // Auto-create client profile if it doesn't exist
+            try {
+                const clientDoc = await getDoc(doc(db, "clients", user.uid));
+                if (!clientDoc.exists()) {
+                    await setDoc(doc(db, "clients", user.uid), {
+                        uid: user.uid,
+                        email: user.email,
+                        status: "Registration In-Progress",
+                        createdAt: serverTimestamp()
+                    }, { merge: true });
+                }
+            } catch (e) {
+                console.error("Firestore Error during auto-profile:", e);
+            }
+
+            // Move to Step 2 if user is authenticated and we are still on Step 1
+            if (window.currentIntakeStep === 1) {
+                window.currentIntakeStep = 2;
+                window.updateWizardUI();
+            }
+        }
+    });
+
     // ─── GOOGLE SIGN IN ───
     const googleBtn = document.querySelector('.btn-social.google');
     if (googleBtn) {
-        googleBtn.addEventListener('click', () => {
-            signInWithRedirect(auth, provider);
+        googleBtn.addEventListener('click', async () => {
+            // Try Popup first (best UX), fallback to Redirect if needed
+            try {
+                const result = await signInWithPopup(auth, provider);
+                console.log("Popup Auth Success");
+            } catch (error) {
+                if (error.code === 'auth/popup-blocked') {
+                    console.log("Popup blocked, falling back to Redirect...");
+                    signInWithRedirect(auth, provider);
+                } else {
+                    console.error("Google Auth Error:", error.code, error.message);
+                    alert(`Sign-In Error: ${error.message}`);
+                }
+            }
         });
     }
 
+    // Handle Redirect Result (for fallback or mobile)
+    getRedirectResult(auth).catch((error) => {
+        if (error.code !== 'auth/callback-internal-error') {
+            console.error("Redirect Result Error:", error.code, error.message);
+        }
+    });
+
+    // ─── NAVIGATION ───
     nextBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const currentStepEl = document.getElementById(`step${window.currentIntakeStep}`);
