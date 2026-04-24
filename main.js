@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) el.addEventListener(event, callback);
     }
 
+    // ─── Environment Detection ───
+    const isLocal = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.protocol === 'file:';
+
     // ─── Mobile Menu Toggle ───
     const mobileToggle = document.getElementById('mobileToggle');
     const navList = document.querySelector('.nav-list');
@@ -73,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
+    const SYSTEM_PROMPT = "You are the Heritage Health Services clinical support AI. Be professional, compassionate, and informative. You are a Registered Nurse. Refer to (262) 554-8800 for assessments.";
+
     if (chatBubble && chatWindow) {
         chatBubble.addEventListener('click', () => {
             chatWindow.classList.toggle('active');
@@ -95,34 +102,46 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // --- REAL AI ENGINE (Used for Local Development) ---
+    async function callGemini(msg) {
+        let key = sessionStorage.getItem('HHS_CHAT_KEY');
+        if (!key) {
+            key = prompt("Real AI Engine Detected (Local Only). Please enter your Gemini API Key:");
+            if (key) sessionStorage.setItem('HHS_CHAT_KEY', key);
+            else return null;
+        }
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${msg}` }] }] })
+            });
+            const data = await resp.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch (e) {
+            console.error("AI Error:", e);
+            return null;
+        }
+    }
+
+    // --- FALLBACK ENGINE (Used for GitHub Pages / Public) ---
     function getClinicalResponse(msg) {
         const lower = msg.toLowerCase();
-        
         if (lower.includes('caregiver') || lower.includes('paid') || lower.includes('pay')) {
-            return "As an RN, I can confirm that Wisconsin Medicaid offers a path for family members to be compensated for providing essential care. To begin, we establish 'Medical Necessity' through a physician’s order and a professional nursing assessment. Would you like to schedule a free RN consultation to see if you qualify?";
+            return "As an RN, I can confirm that Wisconsin Medicaid offers a path for family members to be compensated for providing essential care. To begin, we establish 'Medical Necessity' through a physician’s order and a professional nursing assessment. Would you like to schedule a free RN consultation?";
         }
-        
         if (lower.includes('assessment') || lower.includes('start') || lower.includes('enroll')) {
-            return "Our enrollment process starts with a free in-home nursing assessment. We evaluate Activities of Daily Living (ADLs) to create a personalized Plan of Care. You can call our clinical team at (262) 554-8800 to set this up, or download the enrollment forms in our 'New Clients' section.";
+            return "Our enrollment process starts with a free in-home nursing assessment. We evaluate Activities of Daily Living (ADLs) to create a personalized Plan of Care. You can call our clinical team at (262) 554-8800 to set this up.";
         }
-
         if (lower.includes('hmo') || lower.includes('title 19') || lower.includes('insurance')) {
-            return "We work with both Straight Title 19 (Fee-for-Service) and most major Medicaid HMOs like iCare and UnitedHealthcare. The main difference is how care is authorized. Our intake team acts as your administrative advocate to navigate these specific insurance requirements.";
+            return "We work with both Straight Title 19 and most major Medicaid HMOs like iCare. Our intake team acts as your administrative advocate to navigate these specific insurance requirements.";
         }
-
-        if (lower.includes('area') || lower.includes('county') || lower.includes('racine') || lower.includes('milwaukee')) {
-            return "Heritage Health proudly serves the South East Wisconsin region, including Milwaukee, Racine, and Kenosha counties. Our local office is in Sturtevant, and our nurses travel directly to your home throughout the area.";
-        }
-
-        if (lower.includes('mapp')) {
-            return "The MAPP program is an excellent tool for adults with disabilities who wish to work while maintaining full Medicaid coverage. It offers a higher asset limit ($15,000) and allows you to save for the future without losing your personal care benefits.";
-        }
-
-        return "Thank you for reaching out. As clinical needs are unique to every family, I recommend speaking with one of our Heritage Health care coordinators at (262) 554-8800. They can provide specific guidance tailored to your loved one’s condition.";
+        return "Thank you for reaching out. As clinical needs are unique, I recommend speaking with one of our Heritage Health care coordinators at (262) 554-8800 for specific guidance tailored to your loved one’s condition.";
     }
 
     if (chatForm) {
-        chatForm.addEventListener('submit', (e) => {
+        chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const msg = chatInput.value.trim();
             if (!msg) return;
@@ -130,18 +149,24 @@ document.addEventListener('DOMContentLoaded', () => {
             appendMessage('user', msg);
             chatInput.value = '';
 
-            // Typing indicator
             const typing = document.createElement('div');
             typing.className = 'message bot';
             typing.innerHTML = '<em>Nurse Rachel is typing...</em>';
             chatMessages.appendChild(typing);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            setTimeout(() => {
+            if (isLocal) {
+                // Try Gemini AI if running locally
+                const aiResp = await callGemini(msg);
                 if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
-                const response = getClinicalResponse(msg);
-                appendMessage('bot', response);
-            }, 1000);
+                if (aiResp) appendMessage('bot', aiResp);
+                else appendMessage('bot', getClinicalResponse(msg)); // Fallback if AI fails
+            } else {
+                // Use Fallback instantly on GitHub Pages
+                setTimeout(() => {
+                    if (chatMessages.contains(typing)) chatMessages.removeChild(typing);
+                    appendMessage('bot', getClinicalResponse(msg));
+                }, 800);
+            }
         });
     }
 
