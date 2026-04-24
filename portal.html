@@ -37,6 +37,10 @@
                 <i class="fa-solid fa-heart-pulse"></i>
                 <span>Care Plan</span>
             </a>
+            <a href="#" class="sidebar-link" data-page="healthlog">
+                <i class="fa-solid fa-Stethoscope"></i>
+                <span>Health Log</span>
+            </a>
             <a href="#" class="sidebar-link" data-page="schedule">
                 <i class="fa-solid fa-calendar-days"></i>
                 <span>Schedule</span>
@@ -262,6 +266,66 @@
                 <div class="text-center" style="grid-column: 1/-1; padding: 50px; color: var(--text-muted);">
                     <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
                     <p>Fetching your latest plan of care...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ HEALTH LOG PAGE ═══════════ -->
+        <div class="page" id="page-healthlog">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Health Log</h1>
+                    <p class="page-subtitle">Track and monitor your vital signs</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn-portal" id="openVitalsModal">
+                        <i class="fa-solid fa-plus"></i> Log New Vitals
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Vitals Summary -->
+                <div class="card">
+                    <div class="card-header"><h3>Vital Signs Overview</h3></div>
+                    <div class="card-body">
+                        <div class="stats-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="stat-card" style="padding: 15px; background: #F8FAFC;">
+                                <span class="stat-label">Blood Pressure</span>
+                                <span class="stat-value" style="font-size: 1.4rem;" id="latest-bp">120/80</span>
+                                <span class="stat-trend neutral">Stable</span>
+                            </div>
+                            <div class="stat-card" style="padding: 15px; background: #F8FAFC;">
+                                <span class="stat-label">Heart Rate</span>
+                                <span class="stat-value" style="font-size: 1.4rem;" id="latest-hr">72 bpm</span>
+                                <span class="stat-trend up">Normal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-header"><h3>Recent Readings</h3></div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>BP (mmHg)</th>
+                                        <th>HR (bpm)</th>
+                                        <th>Temp (°F)</th>
+                                        <th>Weight (lbs)</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vitalsTableBody">
+                                    <tr><td colspan="6" class="text-center">No readings logged yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -602,6 +666,44 @@
                 <div class="modal-footer-custom">
                     <button type="button" class="btn-outline-custom" id="cancelMessage">Cancel</button>
                     <button type="submit" class="btn-primary-custom">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vital Signs Modal -->
+    <div id="vitalsModal" class="modal-overlay-custom">
+        <div class="modal-container-custom" style="max-width: 450px;">
+            <div class="modal-header-custom">
+                <h3>Log Vital Signs</h3>
+                <button class="close-modal-custom" id="closeVitalsModal">&times;</button>
+            </div>
+            <form id="vitalsForm" class="modal-body-custom">
+                <div class="form-grid-custom" style="grid-template-columns: 1fr 1fr;">
+                    <div class="form-group">
+                        <label>BP (Systolic/Diastolic)</label>
+                        <input type="text" name="bp" class="form-input-custom" placeholder="120/80">
+                    </div>
+                    <div class="form-group">
+                        <label>Heart Rate (bpm)</label>
+                        <input type="number" name="hr" class="form-input-custom" placeholder="72">
+                    </div>
+                    <div class="form-group">
+                        <label>Temp (°F)</label>
+                        <input type="number" step="0.1" name="temp" class="form-input-custom" placeholder="98.6">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" name="weight" class="form-input-custom" placeholder="165">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Additional Notes</label>
+                    <textarea name="notes" class="form-input-custom" style="height: 60px;" placeholder="e.g., Felt dizzy this morning..."></textarea>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="btn-outline-custom" id="cancelVitals">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Save Vitals</button>
                 </div>
             </form>
         </div>
