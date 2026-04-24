@@ -156,41 +156,9 @@
                         <h3>Today's Schedule</h3>
                         <a href="#" class="card-link" data-goto="schedule">View All</a>
                     </div>
-                    <div class="card-body">
-                        <div class="schedule-item">
-                            <div class="schedule-time">
-                                <span class="time">8:00 AM</span>
-                                <span class="duration">2 hrs</span>
-                            </div>
-                            <div class="schedule-bar active"></div>
-                            <div class="schedule-details">
-                                <h4>Morning Routine Assistance</h4>
-                                <p><i class="fa-solid fa-user-nurse"></i> Sarah M. — <span class="status-badge completed">Completed</span></p>
-                                <p class="evv-tag"><i class="fa-solid fa-location-dot"></i> EVV Verified — 7:58 AM check-in</p>
-                            </div>
-                        </div>
-                        <div class="schedule-item">
-                            <div class="schedule-time">
-                                <span class="time">12:30 PM</span>
-                                <span class="duration">1.5 hrs</span>
-                            </div>
-                            <div class="schedule-bar upcoming"></div>
-                            <div class="schedule-details">
-                                <h4>Lunch Prep &amp; Hygiene Care</h4>
-                                <p><i class="fa-solid fa-user-nurse"></i> Sarah M. — <span class="status-badge upcoming">Upcoming</span></p>
-                            </div>
-                        </div>
-                        <div class="schedule-item">
-                            <div class="schedule-time">
-                                <span class="time">6:00 PM</span>
-                                <span class="duration">2 hrs</span>
-                            </div>
-                            <div class="schedule-bar upcoming"></div>
-                            <div class="schedule-details">
-                                <h4>Evening Routine &amp; Transfer</h4>
-                                <p><i class="fa-solid fa-user-nurse"></i> Sarah M. — <span class="status-badge upcoming">Upcoming</span></p>
-                            </div>
-                        </div>
+                    <div class="card-body" id="realTodaySchedule">
+                        <!-- Populated by JS -->
+                        <div class="text-center" style="padding: 20px; color: var(--text-muted);">Loading today's visits...</div>
                     </div>
                 </div>
 
@@ -212,31 +180,9 @@
                     <div class="card-header">
                         <h3>Your Care Team</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="team-member primary">
-                            <div class="team-avatar">SM</div>
-                            <div class="team-info">
-                                <h4>Sarah M.</h4>
-                                <p>Personal Care Assistant</p>
-                                <span class="team-status online"><i class="fa-solid fa-circle"></i> On Shift</span>
-                            </div>
-                        </div>
-                        <div class="team-member">
-                            <div class="team-avatar rn">RN</div>
-                            <div class="team-info">
-                                <h4>Rachel N., RN</h4>
-                                <p>Supervising Nurse</p>
-                                <span class="team-status">Next review: Apr 22</span>
-                            </div>
-                        </div>
-                        <div class="team-member">
-                            <div class="team-avatar cc">JD</div>
-                            <div class="team-info">
-                                <h4>Jessica D.</h4>
-                                <p>Care Coordinator</p>
-                                <span class="team-status"><i class="fa-solid fa-phone"></i> (262) 554-8800 ext. 12</span>
-                            </div>
-                        </div>
+                    <div class="card-body" id="realCareTeamList">
+                        <!-- Populated by JS -->
+                        <div class="text-center" style="padding: 20px; color: var(--text-muted);">Loading team...</div>
                     </div>
                 </div>
 
@@ -316,86 +262,15 @@
             <div class="page-header">
                 <div>
                     <h1 class="page-title">Care Plan</h1>
-                    <p class="page-subtitle">Your personalized plan of care — Last updated Apr 14, 2026</p>
+                    <p class="page-subtitle" id="careplan-subtitle">Your personalized plan of care — Loading...</p>
                 </div>
             </div>
 
-            <div class="careplan-grid">
-                <div class="card careplan-card">
-                    <div class="card-header">
-                        <h3><i class="fa-solid fa-sun" style="color: #C9A84C;"></i> Morning Routine</h3>
-                        <span class="time-tag">8:00 AM — 10:00 AM</span>
-                    </div>
-                    <div class="card-body">
-                        <ul class="careplan-tasks">
-                            <li><i class="fa-solid fa-check"></i> Assist out of bed and transfer to wheelchair</li>
-                            <li><i class="fa-solid fa-check"></i> Oral hygiene and grooming assistance</li>
-                            <li><i class="fa-solid fa-check"></i> Dressing assistance (upper and lower body)</li>
-                            <li><i class="fa-solid fa-check"></i> Prepare and serve breakfast</li>
-                            <li><i class="fa-solid fa-check"></i> Morning medication reminder</li>
-                            <li><i class="fa-solid fa-check"></i> Blood pressure check and log</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card careplan-card">
-                    <div class="card-header">
-                        <h3><i class="fa-solid fa-cloud-sun" style="color: #3B82F6;"></i> Midday Care</h3>
-                        <span class="time-tag">12:30 PM — 2:00 PM</span>
-                    </div>
-                    <div class="card-body">
-                        <ul class="careplan-tasks">
-                            <li><i class="fa-solid fa-check"></i> Lunch preparation and feeding assistance</li>
-                            <li><i class="fa-solid fa-check"></i> Personal hygiene — incontinence care</li>
-                            <li><i class="fa-solid fa-check"></i> Light housekeeping around living area</li>
-                            <li><i class="fa-solid fa-check"></i> Companionship and engagement activities</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card careplan-card">
-                    <div class="card-header">
-                        <h3><i class="fa-solid fa-moon" style="color: #8B5CF6;"></i> Evening Routine</h3>
-                        <span class="time-tag">6:00 PM — 8:00 PM</span>
-                    </div>
-                    <div class="card-body">
-                        <ul class="careplan-tasks">
-                            <li><i class="fa-solid fa-check"></i> Dinner preparation and serving</li>
-                            <li><i class="fa-solid fa-check"></i> Evening medication reminder</li>
-                            <li><i class="fa-solid fa-check"></i> Bathing / showering assistance</li>
-                            <li><i class="fa-solid fa-check"></i> Pajama dressing and bed transfer</li>
-                            <li><i class="fa-solid fa-check"></i> Ensure home is secure for the night</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card careplan-card notes-card">
-                    <div class="card-header">
-                        <h3><i class="fa-solid fa-clipboard-list" style="color: #10B981;"></i> Clinical Notes</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="clinical-note">
-                            <div class="note-header">
-                                <strong>RN Rachel N.</strong>
-                                <time>April 14, 2026</time>
-                            </div>
-                            <p>Maria continues to show improved mobility with daily transfer exercises. Blood pressure trending stable at 128/82. Updated medication schedule per Dr. Williams' recommendation. Continue current care plan with additional focus on range-of-motion exercises during morning routine.</p>
-                        </div>
-                        <div class="clinical-note">
-                            <div class="note-header">
-                                <strong>Sarah M., PCA</strong>
-                                <time>April 15, 2026</time>
-                            </div>
-                            <p>Morning vital signs within normal limits. Maria had a good appetite today. Completed all ADL tasks as outlined. She mentioned slight stiffness in left knee — will note for RN follow-up.</p>
-                        </div>
-                        <div class="clinical-note">
-                            <div class="note-header">
-                                <strong>RN Rachel N.</strong>
-                                <time>April 10, 2026</time>
-                            </div>
-                            <p>Quarterly assessment completed. All care goals being met. Maria's overall health status is stable. Family caregiver Sarah is performing excellently — passed competency review. Recommend continuing current plan of care for next quarter.</p>
-                        </div>
-                    </div>
+            <div class="careplan-grid" id="dynamicCarePlanGrid">
+                <!-- Populated by JS -->
+                <div class="text-center" style="grid-column: 1/-1; padding: 50px; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <p>Fetching your latest plan of care...</p>
                 </div>
             </div>
         </div>
