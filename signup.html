@@ -69,7 +69,7 @@
 
                 <!-- Wizard Form Area -->
                 <div class="wizard-form-area">
-                    <form id="intakeForm">
+                    <form id="intakeForm" novalidate>
                         
                         <!-- STEP 1: ACCOUNT -->
                         <div class="form-step active" id="step1">
@@ -87,16 +87,16 @@
 
                             <div class="form-group">
                                 <label class="form-label">Email Address</label>
-                                <input type="email" name="email" class="form-input" required placeholder="name@example.com">
+                                <input type="email" name="email" class="form-input" required placeholder="name@example.com" autocomplete="email">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-input" required placeholder="••••••••">
+                                    <input type="password" name="password" class="form-input" required placeholder="••••••••" autocomplete="new-password">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Confirm Password</label>
-                                    <input type="password" name="confirmPassword" class="form-input" required placeholder="••••••••">
+                                    <input type="password" name="confirmPassword" class="form-input" required placeholder="••••••••" autocomplete="new-password">
                                 </div>
                             </div>
                             <div class="wizard-actions">
@@ -298,6 +298,6 @@
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="main.js"></script>
-    <script src="signup.js"></script>
+    <script type="module" src="signup.js"></script>
 </body>
 </html>

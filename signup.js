@@ -59,6 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
             step.classList.remove('active');
             if (parseInt(step.id.replace('step', '')) === window.currentIntakeStep) {
                 step.classList.add('active');
+                
+                // CRITICAL: Resize signature pad if we just entered the signature step
+                if (window.currentIntakeStep === 5 && typeof window.resizeSignatureCanvas === 'function') {
+                    window.resizeSignatureCanvas();
+                }
             }
         });
 
@@ -173,15 +178,15 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundColor: 'rgba(255, 255, 255, 0)',
             penColor: 'rgb(10, 31, 58)'
         });
-        function resizeCanvas() {
+        window.resizeSignatureCanvas = function() {
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext("2d").scale(ratio, ratio);
             signaturePad.clear();
         }
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
+        window.addEventListener("resize", window.resizeSignatureCanvas);
+        window.resizeSignatureCanvas();
         document.getElementById('clearSignature').addEventListener('click', () => {
             signaturePad.clear();
         });
