@@ -141,8 +141,8 @@
                             <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Instantly view or download your complete clinical authorization and referral documentation.</p>
                         </div>
                     </div>
-                    <button class="btn btn-primary" id="viewSignedPacketDashboard" style="padding: 12px 28px; font-weight: 600; letter-spacing: 0.02em;">
-                        <i class="fa-solid fa-download" style="margin-right: 10px;"></i> View Documents
+                    <button class="btn btn-primary view-trigger" id="viewSignedPacketDashboard" data-file-index="0" style="padding: 12px 28px; font-weight: 600; letter-spacing: 0.02em;">
+                        <i class="fa-solid fa-eye" style="margin-right: 10px;"></i> View Documents
                     </button>
                 </div>
             </div>
@@ -389,36 +389,39 @@
             </div>
 
             <div class="docs-grid" id="signedDocsGrid">
+                <!-- 1. Referral Form -->
                 <div class="card doc-card" id="doc-enrollment">
                     <div class="doc-icon"><i class="fa-solid fa-file-contract"></i></div>
                     <div class="doc-info">
                         <h4>New Client Referral</h4>
                         <p>Primary intake and demographics form</p>
                     </div>
-                    <button class="doc-action download-trigger" data-file-index="0" title="Download Signed PDF">
-                        <i class="fa-solid fa-download"></i>
+                    <button class="doc-action view-trigger" data-file-index="0" title="View Signed PDF">
+                        <i class="fa-solid fa-eye"></i>
                     </button>
                 </div>
 
+                <!-- 2. Medical Release -->
                 <div class="card doc-card">
                     <div class="doc-icon"><i class="fa-solid fa-file-medical"></i></div>
                     <div class="doc-info">
                         <h4>Medical Release (ROI)</h4>
                         <p>Standard authorization for health records</p>
                     </div>
-                    <button class="doc-action download-trigger" data-file-index="1" title="Download Signed PDF">
-                        <i class="fa-solid fa-download"></i>
+                    <button class="doc-action view-trigger" data-file-index="1" title="View Signed PDF">
+                        <i class="fa-solid fa-eye"></i>
                     </button>
                 </div>
 
+                <!-- 3. Wheaton Release -->
                 <div class="card doc-card">
                     <div class="doc-icon"><i class="fa-solid fa-hospital-user"></i></div>
                     <div class="doc-info">
                         <h4>Wheaton Records Release</h4>
                         <p>Specific authorization for Wheaton facilities</p>
                     </div>
-                    <button class="doc-action download-trigger" data-file-index="2" title="Download Signed PDF">
-                        <i class="fa-solid fa-download"></i>
+                    <button class="doc-action view-trigger" data-file-index="2" title="View Signed PDF">
+                        <i class="fa-solid fa-eye"></i>
                     </button>
                 </div>
                 

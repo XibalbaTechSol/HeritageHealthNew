@@ -27,6 +27,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -117,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentPdfBlob = new Blob([file.bytes], { type: 'application/pdf' });
                 currentPdfName = file.name;
                 
-                // Using Base64 Data URI is more robust for forcing inline preview in many browsers
                 const reader = new FileReader();
                 reader.readAsDataURL(currentPdfBlob);
                 reader.onloadend = () => {
@@ -162,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.download-trigger') || e.target.closest('#viewSignedPacketDashboard');
+        const btn = e.target.closest('.view-trigger');
         if (btn) handleFileView(btn);
     });
 
@@ -253,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await addDoc(collection(db, "nurse_visits"), { ...data, clientId: auth.currentUser.uid, timestamp: serverTimestamp(), status: "Pending" });
             toggleModal('nurseSchedulerModal', false);
             alert("Visit requested.");
-        } catch (e) { alert(err.message); }
+        } catch (err) { alert(err.message); }
     });
 
     // ─── LISTENERS (LOGS, CARE PLAN, TEAM, NOTIFS) ───
@@ -373,4 +374,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('quick-action-message')?.addEventListener('click', () => { navigateTo('messages'); toggleModal('messageModal', true); });
     document.getElementById('quick-action-download')?.addEventListener('click', () => navigateTo('documents'));
     document.getElementById('quick-action-schedule')?.addEventListener('click', () => { navigateTo('schedule'); toggleModal('nurseSchedulerModal', true); });
+
 });
