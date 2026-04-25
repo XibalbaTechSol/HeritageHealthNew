@@ -117,15 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentPdfBlob = new Blob([file.bytes], { type: 'application/pdf' });
                 currentPdfName = file.name;
                 
-                const url = URL.createObjectURL(currentPdfBlob);
-                const frame = document.getElementById('pdfFrame');
-                const title = document.getElementById('pdfModalTitle');
-                
-                if (frame && title) {
-                    title.textContent = file.name.replace('_Signed.pdf', '');
-                    frame.src = url;
-                    toggleModal('pdfModal', true);
-                }
+                // Using Base64 Data URI is more robust for forcing inline preview in many browsers
+                const reader = new FileReader();
+                reader.readAsDataURL(currentPdfBlob);
+                reader.onloadend = () => {
+                    const base64data = reader.result;
+                    const frame = document.getElementById('pdfFrame');
+                    const title = document.getElementById('pdfModalTitle');
+                    
+                    if (frame && title) {
+                        title.textContent = file.name.replace('_Signed.pdf', '');
+                        frame.src = base64data;
+                        toggleModal('pdfModal', true);
+                    }
+                };
 
                 await addDoc(collection(db, "activity"), {
                     userId: auth.currentUser.uid,
