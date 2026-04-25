@@ -32,6 +32,11 @@ googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- INITIALIZE EMAILJS ---
+    if (window.emailjs) {
+        window.emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your real public key
+    }
+
     let cachedUserData = null;
     let googleEvents = [];
     let selectedMessageId = null;
@@ -129,21 +134,36 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
+        const newMsg = {
+            ...data,
+            clientId: auth.currentUser.uid,
+            senderName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
+            senderRole: "Client",
+            senderInitials: (cachedUserData.firstName[0] + (cachedUserData.lastName ? cachedUserData.lastName[0] : '')).toUpperCase(),
+            timestamp: serverTimestamp(),
+            read: true
+        };
+
         try {
-            // FIX: Added 'db' parameter to addDoc
-            await addDoc(collection(db, "messages"), {
-                ...data,
-                clientId: auth.currentUser.uid,
-                senderName: `${cachedUserData.firstName} ${cachedUserData.lastName}`,
-                senderRole: "Client",
-                senderInitials: (cachedUserData.firstName[0] + (cachedUserData.lastName ? cachedUserData.lastName[0] : '')).toUpperCase(),
-                timestamp: serverTimestamp(),
-                read: true
-            });
+            await addDoc(collection(db, "messages"), newMsg);
+
+            // --- NOTIFY NURSE VIA EMAIL ---
+            if (window.emailjs) {
+                // You'll need to create a simple 'clinical_message' template in EmailJS
+                await window.emailjs.send("YOUR_SERVICE_ID", "YOUR_MSG_TEMPLATE_ID", {
+                    to_email: "xibalbasolutions@gmail.com",
+                    from_name: newMsg.senderName,
+                    subject: data.subject,
+                    message: data.body,
+                    client_id: newMsg.clientId
+                });
+                console.log("Nurse notified via email.");
+            }
+
             toggleModal('messageModal', false);
             e.target.reset();
-            alert("Secure message sent.");
-        } catch (e) { alert("Error sending message: " + e.message); }
+            alert("Secure message sent to clinical team.");
+        } catch (err) { alert("Error: " + err.message); }
     });
 
     document.getElementById('openNurseScheduler')?.addEventListener('click', () => toggleModal('nurseSchedulerModal', true));
